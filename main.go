@@ -26,3 +26,18 @@ type Note struct {
 	Step   int
 	Octave int
 }
+
+// Interval represents a musical interval using Taneyev's digital notation system.
+//
+// This practical numbering system, derived from Sergei Taneyev's "Convertible Counterpoint",
+// represents intervals as signed integers where:
+//   - 0: Unison
+//   - Positive integers: Ascending intervals
+//   - 1: Second up
+//   - 2: Third up
+//   - ...
+//   - Negative integers: Descending intervals
+//   - -1: Second down
+//   - -2: Third down
+//   - ...
+type Interval int
