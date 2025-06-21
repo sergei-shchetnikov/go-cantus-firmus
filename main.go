@@ -16,3 +16,13 @@ func Mod7(n int) int {
 	}
 	return result
 }
+
+// Note represents a musical note in diatonic notation.
+//
+// Fields:
+//   - Step: diatonic step number (0 = C, 1 = D, ..., 6 = B)
+//   - Octave: octave number (4 is the middle octave)
+type Note struct {
+	Step   int
+	Octave int
+}
