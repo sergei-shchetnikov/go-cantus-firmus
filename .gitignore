@@ -1,0 +1,9 @@
+# Binaries
+bin/
+dist/
+
+# Go workspace files
+go.work
+
+# Dependency directories
+vendor/
