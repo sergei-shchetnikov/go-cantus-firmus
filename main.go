@@ -40,4 +40,7 @@ type Note struct {
 //   - -1: Second down
 //   - -2: Third down
 //   - ...
+//
+// Note: The interval value represents the scale degree difference and is abstracted from
+// the absolute pitch magnitude (e.g., minor/major seconds are both represented as 1).
 type Interval int
