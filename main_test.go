@@ -257,3 +257,71 @@ func TestCantusFirmus_ToNotes(t *testing.T) {
 		})
 	}
 }
+
+func TestParseNote(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    Note
+		wantErr bool
+		errText string
+	}{
+		{
+			name:  "valid note C4",
+			input: "C4",
+			want:  Note{Step: 0, Octave: 4},
+		},
+		{
+			name:  "valid note lowercase a5",
+			input: "a5",
+			want:  Note{Step: 5, Octave: 5},
+		},
+		{
+			name:  "valid note B3",
+			input: "B3",
+			want:  Note{Step: 6, Octave: 3},
+		},
+		{
+			name:    "empty string",
+			input:   "",
+			wantErr: true,
+			errText: "invalid note format: string too short",
+		},
+		{
+			name:    "too short",
+			input:   "A",
+			wantErr: true,
+			errText: "invalid note format: string too short",
+		},
+		{
+			name:    "invalid note char",
+			input:   "X5",
+			wantErr: true,
+			errText: "invalid note character: X",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseNote(tt.input)
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("ParseNote(%q) expected error, got nil", tt.input)
+				} else if tt.errText != "" && err.Error() != tt.errText {
+					t.Errorf("ParseNote(%q) error = %v, wantErr %v", tt.input, err.Error(), tt.errText)
+				}
+				return
+			}
+
+			if err != nil {
+				t.Errorf("ParseNote(%q) unexpected error: %v", tt.input, err)
+				return
+			}
+
+			if got != tt.want {
+				t.Errorf("ParseNote(%q) = %v, want %v", tt.input, got, tt.want)
+			}
+		})
+	}
+}

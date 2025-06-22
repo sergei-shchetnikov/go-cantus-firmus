@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // Project: go-cantus-firmus
 // Created: 2025-06-21
@@ -41,6 +44,53 @@ type Note struct {
 func (n Note) String() string {
 	noteNames := []string{"C", "D", "E", "F", "G", "A", "B"}
 	return fmt.Sprintf("%s%d", noteNames[n.Step], n.Octave)
+}
+
+// ParseNote parses a string representation of a musical note into a Note struct.
+// Alterations are not supported.
+//
+// Examples of valid input:
+//   - "C4" (Middle C)
+//   - "G3" (G below middle C)
+//
+// Returns:
+//   - Note struct if parsing is successful
+//   - error if the format is invalid (with specific reason)
+func ParseNote(s string) (Note, error) {
+	if len(s) < 2 {
+		return Note{}, errors.New("invalid note format: string too short")
+	}
+
+	noteChar := s[0]
+	octaveStr := s[1:]
+
+	var step int
+	switch noteChar {
+	case 'C', 'c':
+		step = 0
+	case 'D', 'd':
+		step = 1
+	case 'E', 'e':
+		step = 2
+	case 'F', 'f':
+		step = 3
+	case 'G', 'g':
+		step = 4
+	case 'A', 'a':
+		step = 5
+	case 'B', 'b':
+		step = 6
+	default:
+		return Note{}, fmt.Errorf("invalid note character: %c", noteChar)
+	}
+
+	var octave int
+	_, err := fmt.Sscanf(octaveStr, "%d", &octave)
+	if err != nil {
+		return Note{}, fmt.Errorf("invalid octave: %v", err)
+	}
+
+	return Note{Step: step, Octave: octave}, nil
 }
 
 // Interval represents a musical interval using Taneyev's digital notation system.
