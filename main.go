@@ -9,9 +9,7 @@ import (
 // Created: 2025-06-21
 
 func main() {
-	cf := CantusFirmus{1, 2, -1}    // up 2nd, up 3rd, down 2nd
-	notes := cf.ToNotes(Note{0, 4}) // [C4, D4, F4, E4]
-	fmt.Println(cf, notes)
+
 }
 
 // Mod7 returns the non-negative remainder of division of n by 7.
