@@ -132,9 +132,5 @@ func Transpose(n Note, i Interval) Note {
 // It captures only the sequence of diatonic intervals between consecutive notes, serving as the foundation
 // for later elaboration into a complete melody by applying tonality, mode, and other musical parameters.
 //
-// The primary field, Intervals, stores the interval progression (e.g., [third up, second down, ...]).
-//
 // Example: [third up, second down, second down] → "D4, F4, E4, D4" (if starting from D4).
-type CantusFirmus struct {
-	Intervals []Interval
-}
+type CantusFirmus []Interval
