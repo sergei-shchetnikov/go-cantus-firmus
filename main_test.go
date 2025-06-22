@@ -142,3 +142,63 @@ func TestNote_String(t *testing.T) {
 		})
 	}
 }
+
+func TestIntervalString(t *testing.T) {
+	tests := []struct {
+		name     string
+		interval Interval
+		want     string
+	}{
+		{"unison", 0, "unison"},
+
+		{"second up", 1, "second up"},
+		{"third up", 2, "third up"},
+		{"fourth up", 3, "fourth up"},
+		{"fifth up", 4, "fifth up"},
+		{"sixth up", 5, "sixth up"},
+		{"seventh up", 6, "seventh up"},
+		{"octave up", 7, "octave up"},
+
+		{"second down", -1, "second down"},
+		{"third down", -2, "third down"},
+		{"fourth down", -3, "fourth down"},
+		{"fifth down", -4, "fifth down"},
+		{"sixth down", -5, "sixth down"},
+		{"seventh down", -6, "seventh down"},
+		{"octave down", -7, "octave down"},
+
+		{"9th up", 8, "9th up"},
+		{"10th up", 9, "10th up"},
+		{"11th up", 10, "11th up"},
+		{"12th up", 11, "12th up"},
+		{"13th up", 12, "13th up"},
+		{"14th up", 13, "14th up"},
+		{"15th up", 14, "15th up"},
+
+		{"9th down", -8, "9th down"},
+		{"10th down", -9, "10th down"},
+		{"11th down", -10, "11th down"},
+		{"12th down", -11, "12th down"},
+		{"13th down", -12, "13th down"},
+		{"14th down", -13, "14th down"},
+		{"15th down", -14, "15th down"},
+
+		{"16th up", 15, "16th up"},
+		{"17th up", 16, "17th up"},
+		{"21st up", 20, "21st up"},
+		{"22nd up", 21, "22nd up"},
+		{"23rd up", 22, "23rd up"},
+		{"24th up", 23, "24th up"},
+		{"31st up", 30, "31st up"},
+		{"32nd down", -31, "32nd down"},
+		{"33rd down", -32, "33rd down"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.interval.String(); got != tt.want {
+				t.Errorf("Interval(%d).String() = %v, want %v", tt.interval, got, tt.want)
+			}
+		})
+	}
+}

@@ -59,6 +59,58 @@ func (n Note) String() string {
 // the absolute pitch magnitude (e.g., minor/major seconds are both represented as 1).
 type Interval int
 
+// String returns the human-readable representation of the interval.
+func (i Interval) String() string {
+	absVal := int(i)
+	if absVal < 0 {
+		absVal = -absVal
+	}
+
+	direction := "up"
+	if int(i) < 0 {
+		direction = "down"
+	}
+
+	switch absVal {
+	case 0:
+		return "unison"
+	case 1:
+		return fmt.Sprintf("second %s", direction)
+	case 2:
+		return fmt.Sprintf("third %s", direction)
+	case 3:
+		return fmt.Sprintf("fourth %s", direction)
+	case 4:
+		return fmt.Sprintf("fifth %s", direction)
+	case 5:
+		return fmt.Sprintf("sixth %s", direction)
+	case 6:
+		return fmt.Sprintf("seventh %s", direction)
+	case 7:
+		return fmt.Sprintf("octave %s", direction)
+	}
+
+	intervalNum := absVal + 1 // Convert to musical interval number
+	var suffix string
+
+	switch intervalNum % 10 {
+	case 1:
+		suffix = "st"
+	case 2:
+		suffix = "nd"
+	case 3:
+		suffix = "rd"
+	default:
+		suffix = "th"
+	}
+
+	if intervalNum >= 11 && intervalNum <= 13 {
+		suffix = "th"
+	}
+
+	return fmt.Sprintf("%d%s %s", intervalNum, suffix, direction)
+}
+
 // Transpose transposes a note by the given interval.
 func Transpose(n Note, i Interval) Note {
 	stepDelta := int(i)
