@@ -200,3 +200,8 @@ func Transpose(n Note, i Interval) Note {
 //
 // Example: [third up, second down, second down] → "D4, F4, E4, D4" (if starting from D4).
 type CantusFirmus []Interval
+
+// Realization represents a concrete musical realization of a CantusFirmus as a sequence of notes.
+// It transforms the abstract interval sequence of a CantusFirmus into actual pitches,
+// preserving the melodic contour while making the pitches explicit.
+type Realization []Note
