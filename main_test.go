@@ -295,3 +295,100 @@ func TestParseNote(t *testing.T) {
 		})
 	}
 }
+
+func TestCantusFirmus_Realize(t *testing.T) {
+	tests := []struct {
+		name        string
+		cf          CantusFirmus
+		mode        string
+		wantNotes   []string
+		wantErr     bool
+		errContains string
+	}{
+		{
+			name:      "Major mode - simple ascending",
+			cf:        CantusFirmus{0, 1, 2}, // Unison, second up, third up
+			mode:      "Major",
+			wantNotes: []string{"C4", "C4", "D4", "F4"},
+		},
+		{
+			name:      "Dorian mode - up and down",
+			cf:        CantusFirmus{1, -1, 2}, // Second up, second down, third up
+			mode:      "Dorian",
+			wantNotes: []string{"D4", "E4", "D4", "F4"},
+		},
+		{
+			name:      "Phrygian mode - descending",
+			cf:        CantusFirmus{-1, -1, -2}, // Second down, second down, third down
+			mode:      "Phrygian",
+			wantNotes: []string{"E4", "D4", "C4", "A3"},
+		},
+		{
+			name:      "Lydian mode - octave jump",
+			cf:        CantusFirmus{7, -7}, // Octave up, octave down
+			mode:      "Lydian",
+			wantNotes: []string{"F4", "F5", "F4"},
+		},
+		{
+			name:      "Mixolydian mode - complex",
+			cf:        CantusFirmus{1, 2, -3, 4}, // Second up, third up, fourth down, fifth up
+			mode:      "Mixolydian",
+			wantNotes: []string{"G4", "A4", "C5", "G4", "D5"},
+		},
+		{
+			name:      "Minor mode - simple",
+			cf:        CantusFirmus{1, 1, -2}, // Second up, second up, third down
+			mode:      "Minor",
+			wantNotes: []string{"A4", "B4", "C5", "A4"},
+		},
+		{
+			name:      "Locrian mode - large leap",
+			cf:        CantusFirmus{5, -5}, // Sixth up, sixth down
+			mode:      "Locrian",
+			wantNotes: []string{"B4", "G5", "B4"},
+		},
+		{
+			name:        "Invalid mode",
+			cf:          CantusFirmus{1, 2},
+			mode:        "Blues",
+			wantErr:     true,
+			errContains: "unknown mode",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.cf.Realize(tt.mode)
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("Realize() expected error, got nil")
+				} else if tt.errContains != "" && !contains(err.Error(), tt.errContains) {
+					t.Errorf("Realize() error = %v, want containing %q", err, tt.errContains)
+				}
+				return
+			}
+
+			if err != nil {
+				t.Errorf("Realize() unexpected error: %v", err)
+				return
+			}
+
+			if len(got) != len(tt.wantNotes) {
+				t.Errorf("Realize() length mismatch: got %d notes, want %d", len(got), len(tt.wantNotes))
+				return
+			}
+
+			for i, note := range got {
+				if note.String() != tt.wantNotes[i] {
+					t.Errorf("Realize() note %d = %v, want %v", i, note.String(), tt.wantNotes[i])
+				}
+			}
+		})
+	}
+}
+
+// Helper function to check if string contains substring
+func contains(s, substr string) bool {
+	return len(s) >= len(substr) && s[:len(substr)] == substr
+}

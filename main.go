@@ -201,6 +201,44 @@ func Transpose(n Note, i Interval) Note {
 // Example: [third up, second down, second down] → "D4, F4, E4, D4" (if starting from D4).
 type CantusFirmus []Interval
 
+// Realize generates a concrete musical realization of the CantusFirmus in the specified mode.
+// The first note will be the tonic of the mode (C for Major, D for Dorian, etc.),
+// and subsequent notes will follow the intervals of the CantusFirmus.
+func (cf CantusFirmus) Realize(mode string) (Realization, error) {
+	// Determine the starting note based on the mode
+	var startingNote Note
+	switch mode {
+	case "Major":
+		startingNote = Note{Step: 0, Octave: 4} // C4
+	case "Dorian":
+		startingNote = Note{Step: 1, Octave: 4} // D4
+	case "Phrygian":
+		startingNote = Note{Step: 2, Octave: 4} // E4
+	case "Lydian":
+		startingNote = Note{Step: 3, Octave: 4} // F4
+	case "Mixolydian":
+		startingNote = Note{Step: 4, Octave: 4} // G4
+	case "Minor":
+		startingNote = Note{Step: 5, Octave: 4} // A4
+	case "Locrian":
+		startingNote = Note{Step: 6, Octave: 4} // B4
+	default:
+		return nil, fmt.Errorf("unknown mode: %s", mode)
+	}
+
+	// Create the realization starting with the tonic note
+	realization := Realization{startingNote}
+
+	// Apply each interval in sequence to generate the melody
+	currentNote := startingNote
+	for _, interval := range cf {
+		currentNote = Transpose(currentNote, interval)
+		realization = append(realization, currentNote)
+	}
+
+	return realization, nil
+}
+
 // Realization represents a concrete musical realization of a CantusFirmus as a sequence of notes.
 // It transforms the abstract interval sequence of a CantusFirmus into actual pitches,
 // preserving the melodic contour while making the pitches explicit.
