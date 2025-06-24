@@ -34,16 +34,30 @@ type Note struct {
 	Alteration int
 }
 
-// String returns the string representation of the note in the format "C4".
+// String returns the string representation of the note in standard musical notation.
 // The step numbers are mapped to diatonic note names (0=C, 1=D, ..., 6=B).
-// Octave numbers follow the scientific pitch notation standard.
+// Octave numbers follow scientific pitch notation.
+// Alteration affects the note name:
+//
+//	-1 → flat (represented as "b")
+//	 0 → natural (no symbol)
+//	 1 → sharp (represented as "#")
+//
 // Examples:
-//   - Note{0, 4} → "C4" (Middle C)
-//   - Note{6, 3} → "B3" (B below Middle C)
-//   - Note{0, 5} → "C5" (C one octave above Middle C)
+//   - Note{0, 4, 0}  → "C4" (Middle C)
+//   - Note{0, 4, 1}  → "C#4" (C sharp)
+//   - Note{1, 4, -1} → "Db4" (D flat)
+//   - Note{6, 3, 0}  → "B3" (B below Middle C)
 func (n Note) String() string {
 	noteNames := []string{"C", "D", "E", "F", "G", "A", "B"}
-	return fmt.Sprintf("%s%d", noteNames[n.Step], n.Octave)
+	alterationSymbol := ""
+	switch n.Alteration {
+	case 1:
+		alterationSymbol = "#"
+	case -1:
+		alterationSymbol = "b"
+	}
+	return fmt.Sprintf("%s%s%d", noteNames[n.Step], alterationSymbol, n.Octave)
 }
 
 // ParseNote parses a string representation of a musical note into a Note struct.

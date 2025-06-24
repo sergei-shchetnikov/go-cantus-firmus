@@ -132,6 +132,31 @@ func TestNote_String(t *testing.T) {
 			note:     Note{Step: 4, Octave: 6},
 			expected: "G6",
 		},
+		{
+			name:     "C sharp",
+			note:     Note{Step: 0, Octave: 4, Alteration: 1},
+			expected: "C#4",
+		},
+		{
+			name:     "D flat",
+			note:     Note{Step: 1, Octave: 4, Alteration: -1},
+			expected: "Db4",
+		},
+		{
+			name:     "F sharp high octave",
+			note:     Note{Step: 3, Octave: 5, Alteration: 1},
+			expected: "F#5",
+		},
+		{
+			name:     "G flat low octave",
+			note:     Note{Step: 4, Octave: 2, Alteration: -1},
+			expected: "Gb2",
+		},
+		{
+			name:     "Natural A after alteration",
+			note:     Note{Step: 5, Octave: 4, Alteration: 0},
+			expected: "A4",
+		},
 	}
 
 	for _, tt := range tests {
