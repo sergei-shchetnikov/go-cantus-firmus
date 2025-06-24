@@ -202,7 +202,8 @@ func Transpose(n Note, i Interval) Note {
 type CantusFirmus []Interval
 
 // Realize generates a concrete musical realization of the CantusFirmus in the specified mode.
-// The first note will be the tonic of the mode (C for Major, D for Dorian, etc.),
+// The first note will be the tonic of the mode (C for Major, D for Dorian, E for Phrygian,
+// F for Lydian, G for Mixolydian, A for Minor, B for Locrian),
 // and subsequent notes will follow the intervals of the CantusFirmus.
 func (cf CantusFirmus) Realize(mode string) (Realization, error) {
 	// Determine the starting note based on the mode
