@@ -206,7 +206,6 @@ type CantusFirmus []Interval
 // F for Lydian, G for Mixolydian, A for Minor, B for Locrian),
 // and subsequent notes will follow the intervals of the CantusFirmus.
 func (cf CantusFirmus) Realize(mode string) (Realization, error) {
-	// Determine the starting note based on the mode
 	var startingNote Note
 	switch mode {
 	case "Major":
@@ -227,10 +226,8 @@ func (cf CantusFirmus) Realize(mode string) (Realization, error) {
 		return nil, fmt.Errorf("unknown mode: %s", mode)
 	}
 
-	// Create the realization starting with the tonic note
 	realization := Realization{startingNote}
 
-	// Apply each interval in sequence to generate the melody
 	currentNote := startingNote
 	for _, interval := range cf {
 		currentNote = Transpose(currentNote, interval)
