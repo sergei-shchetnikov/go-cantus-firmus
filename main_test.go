@@ -228,61 +228,6 @@ func TestIntervalString(t *testing.T) {
 	}
 }
 
-func TestCantusFirmus_ToNotes(t *testing.T) {
-	tests := []struct {
-		name      string
-		intervals CantusFirmus
-		startNote Note
-		want      []Note
-	}{
-		{
-			name:      "Empty intervals",
-			intervals: CantusFirmus{},
-			startNote: Note{Step: 0, Octave: 4}, // C4
-			want:      []Note{{0, 4, 0}},
-		},
-		{
-			name:      "Simple ascending",
-			intervals: CantusFirmus{1, 1, 1},                              // up 2nd, up 2nd, up 2nd
-			startNote: Note{0, 4, 0},                                      // C4
-			want:      []Note{{0, 4, 0}, {1, 4, 0}, {2, 4, 0}, {3, 4, 0}}, // C4, D4, E4, F4
-		},
-		{
-			name:      "Mixed intervals",
-			intervals: CantusFirmus{1, 2, -1},                             // up 2nd, up 3rd, down 2nd
-			startNote: Note{0, 4, 0},                                      // C4
-			want:      []Note{{0, 4, 0}, {1, 4, 0}, {3, 4, 0}, {2, 4, 0}}, // C4, D4, F4, E4
-		},
-		{
-			name:      "Octave crossing up",
-			intervals: CantusFirmus{6, 1},                      // up 7th, up 2nd
-			startNote: Note{6, 3, 0},                           // B3
-			want:      []Note{{6, 3, 0}, {5, 4, 0}, {6, 4, 0}}, // B3, A4, B4
-		},
-		{
-			name:      "Octave crossing down",
-			intervals: CantusFirmus{-6, -1},                    // down 7th, down 2nd
-			startNote: Note{0, 5, 0},                           // C5
-			want:      []Note{{0, 5, 0}, {1, 4, 0}, {0, 4, 0}}, // C5, D4, C4
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := tt.intervals.ToNotes(tt.startNote)
-			if len(got) != len(tt.want) {
-				t.Errorf("ToNotes() length = %d, want %d", len(got), len(tt.want))
-				return
-			}
-			for i := range got {
-				if got[i] != tt.want[i] {
-					t.Errorf("ToNotes()[%d] = %v, want %v", i, got[i], tt.want[i])
-				}
-			}
-		})
-	}
-}
-
 func TestParseNote(t *testing.T) {
 	tests := []struct {
 		name    string

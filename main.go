@@ -200,29 +200,3 @@ func Transpose(n Note, i Interval) Note {
 //
 // Example: [third up, second down, second down] → "D4, F4, E4, D4" (if starting from D4).
 type CantusFirmus []Interval
-
-// ToNotes converts the interval sequence into a concrete melody starting from the given note.
-// It returns a slice of notes where:
-//   - The first note is the provided startNote
-//   - Each subsequent note is obtained by applying the corresponding interval from the sequence
-//
-// Example:
-//
-//	cf := CantusFirmus{1, 2, -1}  // [second up third up second down]
-//	notes := cf.ToNotes(Note{0, 4}) // [C4, D4, F4, E4]
-func (cf CantusFirmus) ToNotes(startNote Note) []Note {
-	if len(cf) == 0 {
-		return []Note{startNote}
-	}
-
-	notes := make([]Note, 0, len(cf)+1)
-	notes = append(notes, startNote)
-
-	current := startNote
-	for _, interval := range cf {
-		current = Transpose(current, interval)
-		notes = append(notes, current)
-	}
-
-	return notes
-}
