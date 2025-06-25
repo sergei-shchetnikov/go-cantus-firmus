@@ -392,3 +392,119 @@ func TestCantusFirmus_Realize(t *testing.T) {
 func contains(s, substr string) bool {
 	return len(s) >= len(substr) && s[:len(substr)] == substr
 }
+
+func TestAdjustMinorAlterations(t *testing.T) {
+	tests := []struct {
+		name        string
+		input       Realization
+		expected    Realization
+		description string
+	}{
+		{
+			name: "A_G_A pattern",
+			input: Realization{
+				{Step: 5, Octave: 4, Alteration: 0}, // A
+				{Step: 4, Octave: 4, Alteration: 0}, // G
+				{Step: 5, Octave: 4, Alteration: 0}, // A
+			},
+			expected: Realization{
+				{Step: 5, Octave: 4, Alteration: 0},
+				{Step: 4, Octave: 4, Alteration: 1}, // G#
+				{Step: 5, Octave: 4, Alteration: 0},
+			},
+			description: "Should add sharp to G in A-G-A pattern",
+		},
+		{
+			name: "F_G_A pattern",
+			input: Realization{
+				{Step: 3, Octave: 4, Alteration: 0}, // F
+				{Step: 4, Octave: 4, Alteration: 0}, // G
+				{Step: 5, Octave: 4, Alteration: 0}, // A
+			},
+			expected: Realization{
+				{Step: 3, Octave: 4, Alteration: 1}, // F#
+				{Step: 4, Octave: 4, Alteration: 1}, // G#
+				{Step: 5, Octave: 4, Alteration: 0},
+			},
+			description: "Should add sharps to F and G in F-G-A pattern",
+		},
+		{
+			name: "No alteration pattern",
+			input: Realization{
+				{Step: 5, Octave: 4, Alteration: 0}, // A
+				{Step: 3, Octave: 4, Alteration: 0}, // F
+				{Step: 5, Octave: 4, Alteration: 0}, // A
+			},
+			expected: Realization{
+				{Step: 5, Octave: 4, Alteration: 0},
+				{Step: 3, Octave: 4, Alteration: 0},
+				{Step: 5, Octave: 4, Alteration: 0},
+			},
+			description: "Should not alter notes when no pattern matches",
+		},
+		{
+			name: "Already altered notes",
+			input: Realization{
+				{Step: 5, Octave: 4, Alteration: 0},  // A
+				{Step: 4, Octave: 4, Alteration: -1}, // Gb
+				{Step: 5, Octave: 4, Alteration: 0},  // A
+			},
+			expected: Realization{
+				{Step: 5, Octave: 4, Alteration: 0},
+				{Step: 4, Octave: 4, Alteration: -1}, // Gb remains unchanged
+				{Step: 5, Octave: 4, Alteration: 0},
+			},
+			description: "Should not alter already altered notes",
+		},
+		{
+			name: "Short sequence",
+			input: Realization{
+				{Step: 5, Octave: 4, Alteration: 0}, // A
+				{Step: 4, Octave: 4, Alteration: 0}, // G
+			},
+			expected: Realization{
+				{Step: 5, Octave: 4, Alteration: 0},
+				{Step: 4, Octave: 4, Alteration: 0},
+			},
+			description: "Should not alter notes in sequences shorter than 3",
+		},
+		{
+			name: "Multiple patterns",
+			input: Realization{
+				{Step: 5, Octave: 4, Alteration: 0}, // A
+				{Step: 4, Octave: 4, Alteration: 0}, // G
+				{Step: 5, Octave: 4, Alteration: 0}, // A
+				{Step: 3, Octave: 4, Alteration: 0}, // F
+				{Step: 4, Octave: 4, Alteration: 0}, // G
+				{Step: 5, Octave: 4, Alteration: 0}, // A
+			},
+			expected: Realization{
+				{Step: 5, Octave: 4, Alteration: 0},
+				{Step: 4, Octave: 4, Alteration: 1}, // G#
+				{Step: 5, Octave: 4, Alteration: 0},
+				{Step: 3, Octave: 4, Alteration: 1}, // F#
+				{Step: 4, Octave: 4, Alteration: 1}, // G#
+				{Step: 5, Octave: 4, Alteration: 0},
+			},
+			description: "Should handle multiple patterns in sequence",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := adjustMinorAlterations(tt.input)
+
+			if len(result) != len(tt.expected) {
+				t.Errorf("%s: expected length %d, got %d", tt.description, len(tt.expected), len(result))
+				return
+			}
+
+			for i := range result {
+				if result[i] != tt.expected[i] {
+					t.Errorf("%s: at index %d expected %v, got %v",
+						tt.description, i, tt.expected[i], result[i])
+				}
+			}
+		})
+	}
+}

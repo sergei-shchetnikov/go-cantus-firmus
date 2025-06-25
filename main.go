@@ -234,6 +234,11 @@ func (cf CantusFirmus) Realize(mode string) (Realization, error) {
 		realization = append(realization, currentNote)
 	}
 
+	// Apply alteration rules for minor mode
+	if mode == "Minor" {
+		realization = adjustMinorAlterations(realization)
+	}
+
 	return realization, nil
 }
 
@@ -241,3 +246,43 @@ func (cf CantusFirmus) Realize(mode string) (Realization, error) {
 // It transforms the abstract interval sequence of a CantusFirmus into actual pitches,
 // preserving the melodic contour while making the pitches explicit.
 type Realization []Note
+
+// adjustMinorAlterations adds necessary alteration marks to a Realization in minor mode.
+//
+// Rules:
+//   - Adds sharp to G when the configuration ..., A, G, A, ... appears
+//   - Adds sharps to both F and G when the configuration ..., F, G, A, ... appears
+//   - In all other cases, no sharps are added
+func adjustMinorAlterations(realization Realization) Realization {
+	if len(realization) < 3 {
+		return realization // Not enough notes to analyze configurations
+	}
+
+	adjusted := make(Realization, len(realization))
+	copy(adjusted, realization)
+
+	for i := 1; i < len(adjusted)-1; i++ {
+		prev := adjusted[i-1]
+		current := adjusted[i]
+		next := adjusted[i+1]
+
+		// Configuration ..., A, G, A, ...
+		if prev.Step == 5 && current.Step == 4 && next.Step == 5 {
+			if current.Alteration == 0 { // Only add sharp if the note hasn't been altered yet
+				adjusted[i].Alteration = 1
+			}
+		}
+
+		// Configuration ..., F, G, A, ...
+		if prev.Step == 3 && current.Step == 4 && next.Step == 5 {
+			if prev.Alteration == 0 {
+				adjusted[i-1].Alteration = 1
+			}
+			if current.Alteration == 0 {
+				adjusted[i].Alteration = 1
+			}
+		}
+	}
+
+	return adjusted
+}
