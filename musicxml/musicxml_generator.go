@@ -1,4 +1,4 @@
-package main
+package musicxml
 
 import (
 	"encoding/xml"
@@ -44,7 +44,7 @@ type Measure struct {
 	XMLName    xml.Name    `xml:"measure"`
 	Number     int         `xml:"number,attr"`
 	Attributes *Attributes `xml:"attributes,omitempty"`
-	Direction  *Direction  `xml:"direction,omitempty"` // Tempo and other directions at the beginning
+	Direction  *Direction  `xml:"direction,omitempty"`
 	Notes      []NoteXML   `xml:"note"`
 	Barline    *Barline    `xml:"barline,omitempty"`
 }
@@ -134,29 +134,33 @@ type Sound struct {
 	Tempo   float64  `xml:"tempo,attr"`
 }
 
-// ToMusicXML converts a slice of Realizations into a MusicXML string.
-// Each realization is placed in a separate measure sequentially.
-// The time signature and tempo are set only in the first measure.
-// Each measure ends with a barline.
-func ToMusicXML(realizations []Realization) (string, error) {
-	if len(realizations) == 0 {
-		return "", errors.New("cannot create MusicXML from empty realizations")
+// Note represents a musical note for conversion to MusicXML.
+type Note struct {
+	Step       int
+	Octave     int
+	Alteration int
+}
+
+// ToMusicXML converts a slice of note sequences into a MusicXML string.
+func ToMusicXML(sequences [][]Note) (string, error) {
+	if len(sequences) == 0 {
+		return "", errors.New("cannot create MusicXML from empty sequences")
 	}
 
-	// Check that all realizations have the same length
-	expectedLength := len(realizations[0])
-	for i, r := range realizations {
-		if len(r) != expectedLength {
-			return "", fmt.Errorf("realization %d has length %d, expected %d", i+1, len(r), expectedLength)
+	// Check that all sequences have the same length
+	expectedLength := len(sequences[0])
+	for i, seq := range sequences {
+		if len(seq) != expectedLength {
+			return "", fmt.Errorf("sequence %d has length %d, expected %d", i+1, len(seq), expectedLength)
 		}
 	}
 
 	stepMap := []string{"C", "D", "E", "F", "G", "A", "B"}
 
 	var measures []Measure
-	for measureNum, realization := range realizations {
+	for measureNum, sequence := range sequences {
 		var notesXML []NoteXML
-		for _, n := range realization {
+		for _, n := range sequence {
 			var alter *int
 			if n.Alteration != 0 {
 				a := n.Alteration
@@ -169,7 +173,7 @@ func ToMusicXML(realizations []Realization) (string, error) {
 					Alter:  alter,
 					Octave: n.Octave,
 				},
-				Duration: 4, // Whole note (assuming divisions = 4)
+				Duration: 4,
 				Type:     "whole",
 			})
 		}
@@ -183,15 +187,14 @@ func ToMusicXML(realizations []Realization) (string, error) {
 			},
 		}
 
-		// Add attributes and direction only to the first measure
 		if measureNum == 0 {
-			beats := fmt.Sprintf("%d", len(realization))
+			beats := fmt.Sprintf("%d", len(sequence))
 			measure.Attributes = &Attributes{
-				Divisions: 4,               // Whole note duration is 4 divisions
-				Key:       &Key{Fifths: 0}, // C Major/A Minor (no sharps/flats)
+				Divisions: 4,
+				Key:       &Key{Fifths: 0},
 				Time: &Time{
 					Beats:    beats,
-					BeatType: "1", // Beat type '1' for whole note
+					BeatType: "1",
 				},
 				Clef: &Clef{
 					Sign: "G",
@@ -202,7 +205,7 @@ func ToMusicXML(realizations []Realization) (string, error) {
 				Placement: "above",
 				DirectionType: DirectionType{
 					Metronome: &Metronome{
-						BeatUnit:  "quarter", // Tempo is typically given in quarter notes
+						BeatUnit:  "quarter",
 						PerMinute: 240,
 					},
 				},
