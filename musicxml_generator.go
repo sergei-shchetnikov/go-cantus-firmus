@@ -34,9 +34,9 @@ type PartName struct {
 
 // Part represents the musical content of a single part.
 type Part struct {
-	XMLName xml.Name `xml:"part"`
-	ID      string   `xml:"id,attr"`
-	Measure Measure  `xml:"measure"`
+	XMLName  xml.Name  `xml:"part"`
+	ID       string    `xml:"id,attr"`
+	Measures []Measure `xml:"measure"`
 }
 
 // Measure represents a single measure in a part.
@@ -84,8 +84,6 @@ type NoteXML struct {
 	Pitch    Pitch    `xml:"pitch"`
 	Duration int      `xml:"duration"`
 	Type     string   `xml:"type"`
-	// Voice    int      `xml:"voice,omitempty"` // Removed
-	// Staff    int      `xml:"staff,omitempty"` // Removed
 }
 
 // Pitch represents the pitch of a note.
@@ -136,37 +134,86 @@ type Sound struct {
 	Tempo   float64  `xml:"tempo,attr"`
 }
 
-// ToMusicXML converts a Realization into a MusicXML string.
-func ToMusicXML(r Realization) (string, error) {
-	if len(r) == 0 {
-		return "", errors.New("cannot create MusicXML from empty realization")
+// ToMusicXML converts a slice of Realizations into a MusicXML string.
+// Each realization is placed in a separate measure sequentially.
+// The time signature and tempo are set only in the first measure.
+// Each measure ends with a barline.
+func ToMusicXML(realizations []Realization) (string, error) {
+	if len(realizations) == 0 {
+		return "", errors.New("cannot create MusicXML from empty realizations")
+	}
+
+	// Check that all realizations have the same length
+	expectedLength := len(realizations[0])
+	for i, r := range realizations {
+		if len(r) != expectedLength {
+			return "", fmt.Errorf("realization %d has length %d, expected %d", i+1, len(r), expectedLength)
+		}
 	}
 
 	stepMap := []string{"C", "D", "E", "F", "G", "A", "B"}
 
-	var notesXML []NoteXML
-	for _, n := range r {
-		var alter *int
-		if n.Alteration != 0 {
-			a := n.Alteration
-			alter = &a
+	var measures []Measure
+	for measureNum, realization := range realizations {
+		var notesXML []NoteXML
+		for _, n := range realization {
+			var alter *int
+			if n.Alteration != 0 {
+				a := n.Alteration
+				alter = &a
+			}
+
+			notesXML = append(notesXML, NoteXML{
+				Pitch: Pitch{
+					Step:   stepMap[n.Step],
+					Alter:  alter,
+					Octave: n.Octave,
+				},
+				Duration: 4, // Whole note (assuming divisions = 4)
+				Type:     "whole",
+			})
 		}
 
-		notesXML = append(notesXML, NoteXML{
-			Pitch: Pitch{
-				Step:   stepMap[n.Step],
-				Alter:  alter,
-				Octave: n.Octave,
+		measure := Measure{
+			Number: measureNum + 1,
+			Notes:  notesXML,
+			Barline: &Barline{
+				Location: "right",
+				BarStyle: BarStyle{Text: "light-heavy"},
 			},
-			Duration: 4, // Whole note (assuming divisions = 4)
-			Type:     "whole",
-			// Voice:    1, // Removed
-			// Staff:    1, // Removed
-		})
-	}
+		}
 
-	numNotes := len(r)
-	beats := fmt.Sprintf("%d", numNotes)
+		// Add attributes and direction only to the first measure
+		if measureNum == 0 {
+			beats := fmt.Sprintf("%d", len(realization))
+			measure.Attributes = &Attributes{
+				Divisions: 4,               // Whole note duration is 4 divisions
+				Key:       &Key{Fifths: 0}, // C Major/A Minor (no sharps/flats)
+				Time: &Time{
+					Beats:    beats,
+					BeatType: "1", // Beat type '1' for whole note
+				},
+				Clef: &Clef{
+					Sign: "G",
+					Line: 2,
+				},
+			}
+			measure.Direction = &Direction{
+				Placement: "above",
+				DirectionType: DirectionType{
+					Metronome: &Metronome{
+						BeatUnit:  "quarter", // Tempo is typically given in quarter notes
+						PerMinute: 240,
+					},
+				},
+				Sound: &Sound{
+					Tempo: 240.0,
+				},
+			}
+		}
+
+		measures = append(measures, measure)
+	}
 
 	score := ScorePartwise{
 		PartList: PartList{
@@ -176,39 +223,8 @@ func ToMusicXML(r Realization) (string, error) {
 			},
 		},
 		Part: Part{
-			ID: "P1",
-			Measure: Measure{
-				Number: 1,
-				Attributes: &Attributes{
-					Divisions: 4,               // Whole note duration is 4 divisions
-					Key:       &Key{Fifths: 0}, // C Major/A Minor (no sharps/flats)
-					Time: &Time{
-						Beats:    beats,
-						BeatType: "1", // Beat type '1' for whole note
-					},
-					Clef: &Clef{
-						Sign: "G",
-						Line: 2,
-					},
-				},
-				Direction: &Direction{
-					Placement: "above",
-					DirectionType: DirectionType{
-						Metronome: &Metronome{
-							BeatUnit:  "quarter", // Tempo is typically given in quarter notes
-							PerMinute: 240,
-						},
-					},
-					Sound: &Sound{
-						Tempo: 240.0,
-					},
-				},
-				Notes: notesXML,
-				Barline: &Barline{
-					Location: "right",
-					BarStyle: BarStyle{Text: "light-heavy"},
-				},
-			},
+			ID:       "P1",
+			Measures: measures,
 		},
 	}
 
