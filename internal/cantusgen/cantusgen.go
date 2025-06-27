@@ -11,6 +11,7 @@ var leaps = []int{-4, -3, -2, 2, 3, 4, 5}
 // - Each slice ends with two numbers from 'steps'.
 // - The sum of all elements in each slice must be 0.
 // - All possible permutations with repetitions that meet the conditions are generated.
+// - The first element of each slice must not be 5.
 func GenerateCantus(n int) [][]int {
 	if n < 2 {
 		fmt.Println("Slice length (n) must be at least 2, as the last two elements must be from 'steps'.")
@@ -70,6 +71,7 @@ func GenerateCantus(n int) [][]int {
 		// Attempt to add an element from 'steps'
 		if currentStepsCount < stepsForPrefix {
 			for _, val := range steps {
+				// No need to check for 5 here, as steps does not contain 5
 				generatePrefix(currentIndex+1, append(currentSlice, val), currentSum+val, currentStepsCount+1, currentLeapsCount)
 			}
 		}
@@ -77,6 +79,10 @@ func GenerateCantus(n int) [][]int {
 		// Attempt to add an element from 'leaps'
 		if currentLeapsCount < leapsForPrefix {
 			for _, val := range leaps {
+				// If it's the first element (currentIndex == 0) and the value is 5, skip it
+				if currentIndex == 0 && val == 5 {
+					continue
+				}
 				generatePrefix(currentIndex+1, append(currentSlice, val), currentSum+val, currentStepsCount, currentLeapsCount+1)
 			}
 		}
