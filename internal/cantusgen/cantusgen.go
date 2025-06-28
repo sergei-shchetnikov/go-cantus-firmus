@@ -7,6 +7,12 @@ import (
 var steps = []int{-1, 1}
 var leaps = []int{-4, -3, -2, 2, 3, 4, 5}
 
+// Define the set of validation functions
+var cantusValidators = []rules.ValidationFunc{
+	rules.NoExcessiveNoteRepetition,
+	rules.NoFiveOfSameSign,
+}
+
 // GenerateCantus generates a set of integer slices of length n,
 // satisfying the following conditions:
 // - Each slice contains approximately 70% elements from 'steps' and 30% from 'leaps'.
@@ -38,8 +44,7 @@ func GenerateCantus(n int) [][]int {
 
 	var generatePrefix func(currentIndex int, currentSlice []int, currentSum int, currentStepsCount int, currentLeapsCount int)
 	generatePrefix = func(currentIndex int, currentSlice []int, currentSum int, currentStepsCount int, currentLeapsCount int) {
-		// Check note repetition rule for current partial slice
-		if !rules.NoExcessiveNoteRepetition(currentSlice) {
+		if !rules.AllRules(currentSlice, cantusValidators) {
 			return
 		}
 
@@ -51,7 +56,7 @@ func GenerateCantus(n int) [][]int {
 					finalSlice[n-2] = end1Val
 					finalSlice[n-1] = end2Val
 
-					if !rules.NoFiveOfSameSign(finalSlice) || !rules.NoExcessiveNoteRepetition(finalSlice) {
+					if !rules.AllRules(finalSlice, cantusValidators) {
 						continue
 					}
 
@@ -67,11 +72,6 @@ func GenerateCantus(n int) [][]int {
 		if currentStepsCount < stepsForPrefix {
 			for _, val := range steps {
 				nextSlice := append(currentSlice, val)
-
-				if !rules.NoFiveOfSameSign(nextSlice) {
-					continue
-				}
-
 				generatePrefix(currentIndex+1, nextSlice, currentSum+val, currentStepsCount+1, currentLeapsCount)
 			}
 		}
@@ -82,11 +82,6 @@ func GenerateCantus(n int) [][]int {
 					continue
 				}
 				nextSlice := append(currentSlice, val)
-
-				if !rules.NoFiveOfSameSign(nextSlice) {
-					continue
-				}
-
 				generatePrefix(currentIndex+1, nextSlice, currentSum+val, currentStepsCount, currentLeapsCount+1)
 			}
 		}

@@ -8,6 +8,20 @@
 // to traditional counterpoint rules.
 package rules
 
+// ValidationFunc defines the type for a validation function.
+type ValidationFunc func(s []int) bool
+
+// AllRules checks a slice against a given set of validation functions.
+// It returns false if any function returns false, true otherwise.
+func AllRules(s []int, validators []ValidationFunc) bool {
+	for _, validate := range validators {
+		if !validate(s) {
+			return false
+		}
+	}
+	return true
+}
+
 // NoFiveOfSameSign checks that there are no five consecutive numbers
 // with the same sign (positive or negative) in the currentSlice.
 // In a musical context, this rule helps prevent excessive or monotonous
