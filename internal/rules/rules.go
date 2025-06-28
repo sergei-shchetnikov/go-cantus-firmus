@@ -22,6 +22,15 @@ func AllRules(s []int, validators []ValidationFunc) bool {
 	return true
 }
 
+// NoBeginWithFive checks that the interval sequence doesn't start with 5.
+// Returns false if the first interval is 5, true otherwise.
+func NoBeginWithFive(intervals []int) bool {
+	if len(intervals) > 0 && intervals[0] == 5 {
+		return false
+	}
+	return true
+}
+
 // NoFiveOfSameSign checks that there are no five consecutive numbers
 // with the same sign (positive or negative) in the currentSlice.
 // In a musical context, this rule helps prevent excessive or monotonous

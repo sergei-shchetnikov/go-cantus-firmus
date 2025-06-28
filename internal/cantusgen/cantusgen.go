@@ -9,6 +9,7 @@ var leaps = []int{-4, -3, -2, 2, 3, 4, 5}
 
 // Define the set of validation functions
 var cantusValidators = []rules.ValidationFunc{
+	rules.NoBeginWithFive,
 	rules.NoExcessiveNoteRepetition,
 	rules.NoFiveOfSameSign,
 }
@@ -77,9 +78,6 @@ func GenerateCantus(n int) [][]int {
 
 		if currentLeapsCount < leapsForPrefix {
 			for _, val := range leaps {
-				if currentIndex == 0 && val == 5 {
-					continue
-				}
 				nextSlice := append(currentSlice, val)
 				generatePrefix(currentIndex+1, nextSlice, currentSum+val, currentStepsCount, currentLeapsCount+1)
 			}
