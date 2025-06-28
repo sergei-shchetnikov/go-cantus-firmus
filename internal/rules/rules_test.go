@@ -266,3 +266,60 @@ func TestNoRangeExceedsDecima(t *testing.T) {
 		})
 	}
 }
+
+func TestNoRepeatingPatterns(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "Empty slice",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "Too short sequence",
+			intervals: []int{1, -1},
+			want:      true,
+		},
+		{
+			name:      "No patterns - valid sequence",
+			intervals: []int{1, 2, -1, 2, -2, 1},
+			want:      true,
+		},
+		{
+			name:      "Repeating pattern of length 2 (a,b,a,b)",
+			intervals: []int{1, -1, 1, -1}, // Heights: [0, 1, 0, 1, 0]
+			want:      false,
+		},
+		{
+			name:      "Repeating pattern of length 3 (a,b,c,a,b,c)",
+			intervals: []int{1, 2, -3, 1, 2, -3}, // Heights: [0, 1, 3, 0, 1, 3, 0]
+			want:      false,
+		},
+		{
+			name:      "Partial repeating pattern at start",
+			intervals: []int{1, -1, 1}, // Heights: [0, 1, 0, 1]
+			want:      false,
+		},
+		{
+			name:      "Repeating pattern not at start",
+			intervals: []int{2, 1, -1, 1, -1, 1}, // Heights: [0, 2, 3, 2, 3, 2, 3]
+			want:      false,
+		},
+		{
+			name:      "Large intervals but no repeating patterns",
+			intervals: []int{5, -3, 4, -4, 2, -2},
+			want:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NoRepeatingPatterns(tt.intervals); got != tt.want {
+				t.Errorf("NoRepeatingPatterns() = %v, want %v (intervals: %v)", got, tt.want, tt.intervals)
+			}
+		})
+	}
+}

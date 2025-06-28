@@ -130,3 +130,41 @@ func NoRangeExceedsDecima(intervals []int) bool {
 
 	return true
 }
+
+// NoRepeatingPatterns checks that the cantus firmus doesn't contain repeating pitch patterns
+// by examining the sequence of partial sums (note heights relative to the starting note).
+// Detects patterns like ..., a, b, a, b, ... or ..., a, b, c, a, b, c, ...
+// Works with partial slices during generation.
+//
+// Returns:
+//   - false if any repeating pitch pattern is found (rule violated)
+//   - true otherwise (rule satisfied)
+func NoRepeatingPatterns(intervals []int) bool {
+	if len(intervals) < 3 {
+		return true
+	}
+
+	partialSums := make([]int, len(intervals)+1)
+	partialSums[0] = 0
+	for i, interval := range intervals {
+		partialSums[i+1] = partialSums[i] + interval
+	}
+
+	n := len(partialSums)
+
+	for i := 0; i <= n-4; i++ {
+		a, b := partialSums[i], partialSums[i+1]
+		if partialSums[i+2] == a && partialSums[i+3] == b {
+			return false
+		}
+	}
+
+	for i := 0; i <= n-6; i++ {
+		a, b, c := partialSums[i], partialSums[i+1], partialSums[i+2]
+		if partialSums[i+3] == a && partialSums[i+4] == b && partialSums[i+5] == c {
+			return false
+		}
+	}
+
+	return true
+}
