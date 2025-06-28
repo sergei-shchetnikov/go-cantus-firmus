@@ -14,13 +14,12 @@ var cantusValidators = []rules.ValidationFunc{
 }
 
 // GenerateCantus generates a set of integer slices of length n,
-// satisfying the following conditions:
-// - Each slice contains approximately 70% elements from 'steps' and 30% from 'leaps'.
-// - Each slice ends with two numbers from 'steps'.
-// - The sum of all elements in each slice must be 0.
-// - All possible permutations with repetitions that meet the conditions are generated.
-// - The first element of each slice must not be 5.
-// - No more than five consecutive numbers can have the same sign (enforced by rules.NoFiveOfSameSign).
+// satisfying specific contrapuntal and structural conditions.
+// The function uses a recursive backtracking approach, pruning invalid partial
+// melodies early based on the `cantusValidators` to efficiently generate
+// only valid cantus firmui.
+// The resulting slice of intervals of length 'n' serves as the basis
+// for the implementation of cantus firmus of length 'n+1' in specific notes.
 func GenerateCantus(n int) [][]int {
 	if n < 2 {
 		return nil
