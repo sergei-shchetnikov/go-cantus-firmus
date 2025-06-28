@@ -1,3 +1,11 @@
+// Package rules provides validation functions for contrapuntal rules
+// in cantus firmus. The package operates on abstract representations
+// of cantus firmus as sequences of diatonic intervals between consecutive notes.
+// The package implements contrapuntal rules as validation functions that check
+// whether a given sequence of intervals violates specific composition guidelines.
+// These functions are designed to be integrated with cantus firmus generation
+// algorithms (like in package cantusgen) to ensure generated melodies adhere
+// to traditional counterpoint rules.
 package rules
 
 // NoFiveOfSameSign checks that there are no five consecutive numbers
@@ -20,7 +28,7 @@ func NoFiveOfSameSign(currentSlice []int) bool {
 		s4 := sign(currentSlice[i+3])
 		s5 := sign(currentSlice[i+4])
 
-		if s1 == s2 && s2 == s3 && s3 == s4 && s4 == s5 { // Updated condition
+		if s1 == s2 && s2 == s3 && s3 == s4 && s4 == s5 {
 			return false
 		}
 	}
