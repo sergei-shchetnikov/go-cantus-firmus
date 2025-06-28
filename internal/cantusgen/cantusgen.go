@@ -16,10 +16,10 @@ var cantusValidators = []rules.ValidationFunc{
 
 // GenerateCantus generates a set of integer slices of length n,
 // satisfying specific contrapuntal and structural conditions:
-// - The sum of all intervals in the complete slice equals 0 (returns to starting pitch)
-// - Approximately 70% of intervals are step motions (values from {-1, 1})
-// - The slice always ends with two step motions (values from {-1, 1})
-// - All slices adhere to contrapuntal rules defined in cantusValidators
+//   - The sum of all intervals in the complete slice equals 0 (returns to starting pitch)
+//   - Approximately 70% of intervals are step motions (values from {-1, 1})
+//   - The slice always ends with two step motions (values from {-1, 1})
+//   - All slices adhere to contrapuntal rules defined in cantusValidators
 //
 // The function uses a recursive backtracking approach, pruning invalid partial
 // melodies early based on the `cantusValidators` to efficiently generate
