@@ -22,22 +22,13 @@ func GenerateCantus(n int) [][]int {
 
 	var result [][]int
 
-	// Determine the required number of elements from 'steps' and 'leaps'
-	// Account for the last 2 elements already being 'steps'
 	requiredSteps := int(float64(n) * 0.7)
 	requiredLeaps := n - requiredSteps
 
-	// If requiredSteps is less than 2, it means even with the last two steps
-	// we won't be able to reach 70% 'steps' if n is very small.
-	// Or if requiredLeaps is negative, which is also an error.
-	if requiredSteps < 2 {
-		return nil
-	}
-	if requiredLeaps < 0 {
+	if requiredSteps < 2 || requiredLeaps < 0 {
 		return nil
 	}
 
-	// Number of 'steps' and 'leaps' for the first (n-2) positions
 	stepsForPrefix := requiredSteps - 2
 	leapsForPrefix := requiredLeaps
 
@@ -45,12 +36,14 @@ func GenerateCantus(n int) [][]int {
 		return nil
 	}
 
-	// Recursive function to generate the prefix
 	var generatePrefix func(currentIndex int, currentSlice []int, currentSum int, currentStepsCount int, currentLeapsCount int)
 	generatePrefix = func(currentIndex int, currentSlice []int, currentSum int, currentStepsCount int, currentLeapsCount int) {
-		// Base case: prefix is filled
+		// Check note repetition rule for current partial slice
+		if !rules.NoExcessiveNoteRepetition(currentSlice) {
+			return
+		}
+
 		if currentIndex == n-2 {
-			// Now try adding the last two elements from 'steps'
 			for _, end1Val := range steps {
 				for _, end2Val := range steps {
 					finalSlice := make([]int, n)
@@ -58,12 +51,8 @@ func GenerateCantus(n int) [][]int {
 					finalSlice[n-2] = end1Val
 					finalSlice[n-1] = end2Val
 
-					// !!! Important: Final check for NoFiveOfSameSign on the complete slice !!!
-					// Although partial checks are done during generation,
-					// this ensures the very end of the slice (which was not part of the prefix)
-					// also adheres to the rule if it forms a consecutive sequence.
-					if !rules.NoFiveOfSameSign(finalSlice) {
-						continue // Skip this finalSlice if it violates the rule
+					if !rules.NoFiveOfSameSign(finalSlice) || !rules.NoExcessiveNoteRepetition(finalSlice) {
+						continue
 					}
 
 					totalSum := currentSum + end1Val + end2Val
@@ -75,33 +64,27 @@ func GenerateCantus(n int) [][]int {
 			return
 		}
 
-		// Attempt to add an element from 'steps'
 		if currentStepsCount < stepsForPrefix {
 			for _, val := range steps {
 				nextSlice := append(currentSlice, val)
-				// No need to check for 5 here, as steps does not contain 5
 
-				// !!! Key step: Intermediate check for NoFiveOfSameSign !!!
-				if !rules.NoFiveOfSameSign(nextSlice) { //
-					continue // Skip this branch if the condition is violated
+				if !rules.NoFiveOfSameSign(nextSlice) {
+					continue
 				}
 
 				generatePrefix(currentIndex+1, nextSlice, currentSum+val, currentStepsCount+1, currentLeapsCount)
 			}
 		}
 
-		// Attempt to add an element from 'leaps'
 		if currentLeapsCount < leapsForPrefix {
 			for _, val := range leaps {
-				// If it's the first element (currentIndex == 0) and the value is 5, skip it
 				if currentIndex == 0 && val == 5 {
 					continue
 				}
 				nextSlice := append(currentSlice, val)
 
-				// !!! Key step: Intermediate check for NoFiveOfSameSign !!!
-				if !rules.NoFiveOfSameSign(nextSlice) { //
-					continue // Skip this branch if the condition is violated
+				if !rules.NoFiveOfSameSign(nextSlice) {
+					continue
 				}
 
 				generatePrefix(currentIndex+1, nextSlice, currentSum+val, currentStepsCount, currentLeapsCount+1)
@@ -109,7 +92,6 @@ func GenerateCantus(n int) [][]int {
 		}
 	}
 
-	// Start the generation process
 	generatePrefix(0, []int{}, 0, 0, 0)
 
 	return result

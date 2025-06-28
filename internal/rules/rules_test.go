@@ -79,3 +79,70 @@ func TestNoFiveOfSameSign(t *testing.T) {
 		})
 	}
 }
+
+func TestNoExcessiveNoteRepetition(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "empty slice",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "no repetitions",
+			intervals: []int{1, -1, 2, -2},
+			want:      true,
+		},
+		{
+			name:      "exactly 4 repetitions",
+			intervals: []int{1, -1, 1, -1, 1, -1},
+			want:      true,
+		},
+		{
+			name:      "5 repetitions (violation)",
+			intervals: []int{1, -1, 1, -1, 1, -1, 1, -1, 1, -1},
+			want:      false,
+		},
+		{
+			name:      "multiple notes with 4 reps",
+			intervals: []int{1, 1, -2, 2, -2, 2, -1, 2, -1},
+			want:      true,
+		},
+		{
+			name:      "one note with 5 reps",
+			intervals: []int{0, 0, 0, 0, 0},
+			want:      false,
+		},
+		{
+			name:      "complex pattern valid",
+			intervals: []int{2, -1, 1, -2, 3, -3, 1, -1, 2, -1},
+			want:      true,
+		},
+		{
+			name:      "complex pattern invalid",
+			intervals: []int{2, -2, 2, -2, 2, -2, 2, -2, 2, -2, 2},
+			want:      false,
+		},
+		{
+			name:      "partial slice valid",
+			intervals: []int{1, -1, 1, -1},
+			want:      true,
+		},
+		{
+			name:      "partial slice invalid",
+			intervals: []int{0, 0, 0, 0, 0},
+			want:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NoExcessiveNoteRepetition(tt.intervals); got != tt.want {
+				t.Errorf("NoExcessiveNoteRepetition() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
