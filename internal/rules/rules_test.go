@@ -193,3 +193,76 @@ func TestNoExcessiveNoteRepetition(t *testing.T) {
 		})
 	}
 }
+
+func TestNoRangeExceedsDecima(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		expected  bool
+	}{
+		{
+			name:      "empty slice",
+			intervals: []int{},
+			expected:  true,
+		},
+		{
+			name:      "single interval within range",
+			intervals: []int{5},
+			expected:  true,
+		},
+		{
+			name:      "exact decima range",
+			intervals: []int{5, 4},
+			expected:  true,
+		},
+		{
+			name:      "exceeds decima",
+			intervals: []int{5, 5},
+			expected:  false,
+		},
+		{
+			name:      "multiple steps within range",
+			intervals: []int{1, 1, 1, 1, 1, -1, -1, -1, -1, -1},
+			expected:  true,
+		},
+		{
+			name:      "ascending then descending within range",
+			intervals: []int{5, -3, 4, -2},
+			expected:  true,
+		},
+		{
+			name:      "exceeds decima with negative intervals",
+			intervals: []int{-5, -5},
+			expected:  false,
+		},
+		{
+			name:      "boundary case - just below decima",
+			intervals: []int{4, 4},
+			expected:  true,
+		},
+		{
+			name:      "boundary case - exactly decima",
+			intervals: []int{4, 5},
+			expected:  true,
+		},
+		{
+			name:      "boundary case - just above decima",
+			intervals: []int{5, 5},
+			expected:  false,
+		},
+		{
+			name:      "complex pattern within range",
+			intervals: []int{3, -1, 4, -2, 2, -3, 1, -4},
+			expected:  true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := NoRangeExceedsDecima(tt.intervals)
+			if got != tt.expected {
+				t.Errorf("NoRangeExceedsDecima(%v) = %v, want %v", tt.intervals, got, tt.expected)
+			}
+		})
+	}
+}

@@ -97,3 +97,36 @@ func NoExcessiveNoteRepetition(intervals []int) bool {
 
 	return true
 }
+
+// NoRangeExceedsDecima checks that the range of the cantus firmus (difference between
+// highest and lowest notes) does not exceed a decima (9 in interval notation).
+// Works with partial slices during generation.
+//
+// Returns:
+//   - false if the range exceeds 9 (rule violated)
+//   - true otherwise (rule satisfied)
+func NoRangeExceedsDecima(intervals []int) bool {
+	if len(intervals) == 0 {
+		return true
+	}
+
+	currentSum := 0
+	minSum := 0
+	maxSum := 0
+
+	for _, interval := range intervals {
+		currentSum += interval
+		if currentSum < minSum {
+			minSum = currentSum
+		}
+		if currentSum > maxSum {
+			maxSum = currentSum
+		}
+
+		if maxSum-minSum > 9 {
+			return false
+		}
+	}
+
+	return true
+}
