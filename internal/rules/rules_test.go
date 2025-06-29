@@ -395,3 +395,120 @@ func TestPreparedLeaps(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateLeapResolution(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "empty sequence",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "single element",
+			intervals: []int{1},
+			want:      true,
+		},
+		{
+			name:      "no leaps",
+			intervals: []int{1, 2, -1, 2, -2, 1},
+			want:      true,
+		},
+		{
+			name:      "single leap at end (no resolution needed)",
+			intervals: []int{1, 1, 3},
+			want:      true,
+		},
+		{
+			name:      "properly resolved fourth (3)",
+			intervals: []int{3, -1},
+			want:      true,
+		},
+		{
+			name:      "properly resolved fourth (-3)",
+			intervals: []int{-3, 1},
+			want:      true,
+		},
+		{
+			name:      "unresolved fourth (3)",
+			intervals: []int{3, 1},
+			want:      false,
+		},
+		{
+			name:      "properly resolved fifth (4)",
+			intervals: []int{4, -2},
+			want:      true,
+		},
+		{
+			name:      "properly resolved fifth with two steps (4)",
+			intervals: []int{4, -1, -1},
+			want:      true,
+		},
+		{
+			name:      "unresolved fifth (4)",
+			intervals: []int{4, 1},
+			want:      false,
+		},
+		{
+			name:      "properly resolved sixth (5)",
+			intervals: []int{5, -3},
+			want:      true,
+		},
+		{
+			name:      "properly resolved sixth with multiple steps (5)",
+			intervals: []int{5, -1, -2},
+			want:      true,
+		},
+		{
+			name:      "unresolved sixth (5)",
+			intervals: []int{5, 1},
+			want:      false,
+		},
+		{
+			name:      "multiple leaps all resolved",
+			intervals: []int{3, -1, 4, -2, 1, 5, -3},
+			want:      true,
+		},
+		{
+			name:      "multiple leaps with one unresolved",
+			intervals: []int{3, -1, 4, 1, 5, -3},
+			want:      false,
+		},
+		{
+			name:      "leap at beginning and end",
+			intervals: []int{3, -1, 1, 1, 5},
+			want:      true,
+		},
+		{
+			name:      "consecutive leaps with proper resolution",
+			intervals: []int{3, -3, 4, -4},
+			want:      true,
+		},
+		{
+			name:      "consecutive leaps with improper resolution",
+			intervals: []int{3, 3, 4, -4},
+			want:      false,
+		},
+		{
+			name:      "complex sequence with mixed leaps",
+			intervals: []int{1, 3, -1, 2, 5, -2, -1, 4, -2, 1, -3, 1},
+			want:      true,
+		},
+		{
+			name:      "complex sequence with unresolved leap",
+			intervals: []int{1, 3, -1, 2, 5, -1, -1, 4, -2, 1, -3, 1},
+			want:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ValidateLeapResolution(tt.intervals); got != tt.want {
+				t.Errorf("ValidateLeapResolution() = %v, want %v for sequence %v", got, tt.want, tt.intervals)
+			}
+		})
+	}
+}

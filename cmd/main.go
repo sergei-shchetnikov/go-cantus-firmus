@@ -42,7 +42,7 @@ func selectRandomItems[T any](items []T, count int) []T {
 // 3. Exports to MusicXML format
 func main() {
 	// Generate cantus firmus melodies of length 10
-	generated := cantusgen.GenerateCantus(10)
+	generated := cantusgen.GenerateCantus(13)
 	fmt.Printf("Generated %d cantus firmus melodies\n", len(generated))
 
 	if len(generated) == 0 {

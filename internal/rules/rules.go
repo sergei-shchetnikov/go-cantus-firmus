@@ -263,3 +263,124 @@ func abs(x int) int {
 	}
 	return x
 }
+
+// ValidateLeapResolution checks if all leaps (intervals with absolute value > 2)
+// are properly resolved according to counterpoint rules.
+// It works with partial slices during generation.
+//
+// Returns:
+//   - true if all leaps are properly resolved or if the slice contains no leaps
+//   - false if any leap resolution violates the rules
+func ValidateLeapResolution(intervals []int) bool {
+	n := len(intervals)
+	if n <= 1 {
+		return true
+	}
+
+	// Find all leaps (absolute value > 2)
+	leapIndices := make([]int, 0)
+	for i := 0; i < n; i++ {
+		if abs(intervals[i]) > 2 {
+			leapIndices = append(leapIndices, i)
+		}
+	}
+
+	// No leaps found
+	if len(leapIndices) == 0 {
+		return true
+	}
+
+	// Check resolution for each leap
+	for _, leapIndex := range leapIndices {
+		// Skip if the leap is at the end (no resolution needed yet)
+		if leapIndex == n-1 {
+			continue
+		}
+
+		leap := intervals[leapIndex]
+		absLeap := abs(leap)
+		leapSlice := intervals[leapIndex:]
+
+		// Dispatch validation based on leap size
+		var resolved bool
+		switch absLeap {
+		case 3:
+			resolved = validateFourthLeapResolution(leapSlice)
+		case 4:
+			resolved = validateFifthLeapResolution(leapSlice)
+		case 5:
+			resolved = validateSixthLeapResolution(leapSlice)
+		default:
+			resolved = true // Larger leaps are handled elsewhere or not considered
+		}
+
+		if !resolved {
+			return false
+		}
+	}
+
+	return true
+}
+
+// validateFourthLeapResolution handles resolution for leaps of 3 or -3 (fourth)
+func validateFourthLeapResolution(intervals []int) bool {
+	if len(intervals) < 2 {
+		return true
+	}
+	return sign(intervals[0]) == -sign(intervals[1])
+}
+
+// validateFifthLeapResolution handles resolution for leaps of 4 or -4 (fifth)
+func validateFifthLeapResolution(intervals []int) bool {
+	n := len(intervals)
+	if n < 2 {
+		return true
+	}
+
+	leap := intervals[0]
+	next1 := intervals[1]
+
+	// Case with exactly one element after leap
+	if n == 2 {
+		return sign(leap) == -sign(next1)
+	}
+
+	// Case with at least two elements after leap
+	next2 := intervals[2]
+	return (sign(leap) == -sign(next1) && abs(next1) >= 2) ||
+		(sign(leap) == -sign(next1) && sign(leap) == -sign(next2))
+}
+
+// validateSixthLeapResolution handles resolution for leap of 5 (sixth)
+func validateSixthLeapResolution(intervals []int) bool {
+	n := len(intervals)
+	if n < 2 {
+		return true
+	}
+
+	leap := intervals[0]
+	if leap != 5 {
+		return false
+	}
+
+	next1 := intervals[1]
+
+	// Case with exactly one element after leap
+	if n == 2 {
+		return sign(leap) == -sign(next1)
+	}
+
+	next2 := intervals[2]
+
+	// Case with exactly two elements after leap
+	if n == 3 {
+		return (next1 < 0 && abs(next1) >= 3) ||
+			(sign(leap) == -sign(next1) && sign(leap) == -sign(next2))
+	}
+
+	// Case with at least three elements after leap
+	next3 := intervals[3]
+	return (next1 < 0 && abs(next1) >= 3) ||
+		(next1 < 0 && next2 < 0 && (abs(next1)+abs(next2)) >= 3) ||
+		(next1 < 0 && next2 < 0 && next3 < 0)
+}
