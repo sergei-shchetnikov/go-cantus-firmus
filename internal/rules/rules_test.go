@@ -323,3 +323,75 @@ func TestNoRepeatingPatterns(t *testing.T) {
 		})
 	}
 }
+
+func TestPreparedLeaps(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "empty slice",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "single small step",
+			intervals: []int{2},
+			want:      true,
+		},
+		{
+			name:      "fourth leap with contrary motion",
+			intervals: []int{-2, 3},
+			want:      true,
+		},
+		{
+			name:      "fourth leap without contrary motion",
+			intervals: []int{1, 3},
+			want:      false,
+		},
+		{
+			name:      "fifth leap with single contrary step",
+			intervals: []int{-2, 4},
+			want:      true,
+		},
+		{
+			name:      "fifth leap with double contrary motion",
+			intervals: []int{-1, -1, 4},
+			want:      true,
+		},
+		{
+			name:      "fifth leap without preparation",
+			intervals: []int{1, 4},
+			want:      false,
+		},
+		{
+			name:      "sixth leap with triple descending",
+			intervals: []int{-1, -1, -1, 5},
+			want:      true,
+		},
+		{
+			name:      "sixth leap with double descending leaps",
+			intervals: []int{-3, -2, 5},
+			want:      true,
+		},
+		{
+			name:      "sixth leap with single large descending",
+			intervals: []int{-4, 5},
+			want:      true,
+		},
+		{
+			name:      "sixth leap without preparation",
+			intervals: []int{1, 5}, // не подготовлен
+			want:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PreparedLeaps(tt.intervals); got != tt.want {
+				t.Errorf("PreparedLeaps() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

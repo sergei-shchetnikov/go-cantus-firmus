@@ -168,3 +168,98 @@ func NoRepeatingPatterns(intervals []int) bool {
 
 	return true
 }
+
+// PreparedLeaps checks if leaps are properly prepared by contrary motion according to counterpoint rules
+func PreparedLeaps(intervals []int) bool {
+	n := len(intervals)
+	if n <= 1 {
+		return true
+	}
+
+	last := intervals[n-1]
+	absLast := abs(last)
+
+	// Small steps don't need preparation
+	if absLast <= 2 {
+		return true
+	}
+
+	// Dispatch validation based on leap size
+	switch absLast {
+	case 3:
+		return validateFourthLeap(intervals)
+	case 4:
+		return validateFifthLeap(intervals)
+	case 5:
+		return validateSixthLeap(intervals)
+	default:
+		return true
+	}
+}
+
+// validateFourthLeap handles preparation for leaps of 3 or -3 (fourth)
+func validateFourthLeap(intervals []int) bool {
+	n := len(intervals)
+	last := intervals[n-1]
+	return n >= 2 && sign(intervals[n-2]) == -sign(last)
+}
+
+// validateFifthhLeap handles preparation for leaps of 4 or -4 (fifth)
+func validateFifthLeap(intervals []int) bool {
+	n := len(intervals)
+	last := intervals[n-1]
+
+	if n >= 2 {
+		prev := intervals[n-2]
+		if sign(prev) == -sign(last) && abs(prev) >= 2 {
+			return true
+		}
+	}
+	if n >= 3 {
+		prev1 := intervals[n-2]
+		prev2 := intervals[n-3]
+		return sign(prev1) == -sign(last) && sign(prev2) == -sign(last)
+	}
+	return false
+}
+
+// validateSixthLeap handles preparation for leap of 5 (sixth)
+func validateSixthLeap(intervals []int) bool {
+	n := len(intervals)
+	last := intervals[n-1]
+
+	if last != 5 {
+		return false
+	}
+
+	switch {
+	case n >= 4:
+		prev1 := intervals[n-2]
+		prev2 := intervals[n-3]
+		prev3 := intervals[n-4]
+		if prev1 < 0 && prev2 < 0 && prev3 < 0 {
+			return true
+		}
+		fallthrough
+	case n >= 3:
+		prev1 := intervals[n-2]
+		prev2 := intervals[n-3]
+		if prev1 < 0 && prev2 < 0 && (abs(prev1) >= 2 || abs(prev2) >= 2) {
+			return true
+		}
+		fallthrough
+	case n >= 2:
+		prev := intervals[n-2]
+		return prev < 0 && abs(prev) >= 3
+	default:
+		return false
+	}
+}
+
+// abs returns the absolute value of an integer
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
