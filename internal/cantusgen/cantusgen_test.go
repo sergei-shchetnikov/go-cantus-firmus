@@ -93,3 +93,34 @@ func TestGenerateCantus_ValidInput(t *testing.T) {
 func contains(slice []int, val int) bool {
 	return slices.Contains(slice, val)
 }
+
+func TestGenerateCantusContainsSpecificSlice(t *testing.T) {
+	n := 10
+	target := []int{2, -1, -1, 3, -1, 2, -1, -1, -1, -1} // cantus by Johann Joseph Fux
+
+	result := GenerateCantus(n)
+
+	found := false
+	for _, slice := range result {
+		if equalSlices(slice, target) {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		t.Errorf("Expected slice %v not found in GenerateCantus(%d) result", target, n)
+	}
+}
+
+func equalSlices(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
