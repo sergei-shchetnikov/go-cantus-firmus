@@ -512,3 +512,70 @@ func TestValidateLeapResolution(t *testing.T) {
 		})
 	}
 }
+
+func TestNoTripleAlternatingNote(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "empty slice",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "too short sequence",
+			intervals: []int{1, -1, 1},
+			want:      true,
+		},
+		{
+			name:      "no alternating pattern",
+			intervals: []int{1, 2, 3, 4, 5},
+			want:      true,
+		},
+		{
+			name:      "simple alternating pattern (a, b, a, c, a)",
+			intervals: []int{1, -1, 1, -1},
+			want:      false,
+		},
+		{
+			name:      "complex alternating pattern",
+			intervals: []int{1, 1, 3, -4, 4, 2, -2},
+			want:      false,
+		},
+		{
+			name:      "pattern at beginning",
+			intervals: []int{1, -1, 4, -4, 1, -1},
+			want:      false,
+		},
+		{
+			name:      "pattern at end",
+			intervals: []int{2, -1, -1, -1, -2, 2, 1, -1, 1},
+			want:      false,
+		},
+		{
+			name:      "pattern in middle",
+			intervals: []int{2, 2, 1, -1, -3, 3, -2, -2},
+			want:      false,
+		},
+		{
+			name:      "no pattern with same notes but not alternating",
+			intervals: []int{1, 1, 1, 1, 1},
+			want:      true,
+		},
+		{
+			name:      "long sequence without pattern",
+			intervals: []int{2, -1, -1, 3, -1, 2, -1, -1, -1, -1},
+			want:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NoTripleAlternatingNote(tt.intervals); got != tt.want {
+				t.Errorf("NoTripleAlternatingNote() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

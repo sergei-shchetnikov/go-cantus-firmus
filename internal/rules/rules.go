@@ -384,3 +384,35 @@ func validateSixthLeapResolution(intervals []int) bool {
 		(next1 < 0 && next2 < 0 && (abs(next1)+abs(next2)) >= 3) ||
 		(next1 < 0 && next2 < 0 && next3 < 0)
 }
+
+// NoTripleAlternatingNote checks that no note repeats three times in an alternating pattern (a, b, a, c, a).
+// Works with partial slices during generation.
+//
+// Returns:
+//   - false if the pattern is found (rule violated)
+//   - true otherwise (rule satisfied)
+func NoTripleAlternatingNote(intervals []int) bool {
+	if len(intervals) < 4 {
+		return true
+	}
+
+	// Compute partial sums (note heights relative to the starting note)
+	partialSums := make([]int, len(intervals)+1)
+	partialSums[0] = 0
+	for i, interval := range intervals {
+		partialSums[i+1] = partialSums[i] + interval
+	}
+
+	// Check for the pattern a, b, a, c, a
+	for i := 0; i <= len(partialSums)-5; i++ {
+		a := partialSums[i]
+
+		// Check if the same note appears at positions i, i+2, and i+4
+		if partialSums[i+2] == a && partialSums[i+4] == a {
+			return false
+		}
+
+	}
+
+	return true
+}
