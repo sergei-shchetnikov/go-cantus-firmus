@@ -442,3 +442,46 @@ func NoNoteRepetitionAfterLeap(intervals []int) bool {
 
 	return true
 }
+
+// NoRepeatingExtremes checks that there are no two identical adjacent peaks or valleys
+// in the cantus firmus. It builds a sequence of partial sums (representing note heights),
+// then identifies local extrema (excluding the first and last notes), and checks for
+// the pattern ..., a, b, a, ... in the extrema sequence.
+//
+// Returns:
+//   - false if the pattern is found (rule violated)
+//   - true otherwise (rule satisfied)
+func NoRepeatingExtremes(intervals []int) bool {
+	if len(intervals) < 3 {
+		return true
+	}
+
+	// Build partial sums (note heights)
+	partialSums := make([]int, len(intervals)+1)
+	partialSums[0] = 0
+	for i, interval := range intervals {
+		partialSums[i+1] = partialSums[i] + interval
+	}
+
+	// Find all local extrema (excluding first and last notes)
+	extrema := make([]int, 0)
+	for i := 1; i < len(partialSums)-1; i++ {
+		prev := partialSums[i-1]
+		current := partialSums[i]
+		next := partialSums[i+1]
+
+		// Check for peak (current > neighbors) or valley (current < neighbors)
+		if (current > prev && current > next) || (current < prev && current < next) {
+			extrema = append(extrema, current)
+		}
+	}
+
+	// Check for the pattern a, b, a in extrema
+	for i := 0; i < len(extrema)-2; i++ {
+		if extrema[i] == extrema[i+2] {
+			return false
+		}
+	}
+
+	return true
+}

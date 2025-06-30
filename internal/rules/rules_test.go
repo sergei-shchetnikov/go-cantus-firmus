@@ -646,3 +646,70 @@ func TestNoNoteRepetitionAfterLeap(t *testing.T) {
 		})
 	}
 }
+
+func TestNoRepeatingExtremes(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "empty sequence",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "too short sequence",
+			intervals: []int{1, 2},
+			want:      true,
+		},
+		{
+			name:      "simple ascending",
+			intervals: []int{1, 1, 1, 1},
+			want:      true,
+		},
+		{
+			name:      "simple descending",
+			intervals: []int{-1, -1, -1, -1},
+			want:      true,
+		},
+		{
+			name:      "single peak",
+			intervals: []int{1, 1, -2},
+			want:      true,
+		},
+		{
+			name:      "single valley",
+			intervals: []int{-1, -1, -1, 3},
+			want:      true,
+		},
+		{
+			name:      "repeating peaks", // C D E A E D C
+			intervals: []int{1, 1, -4, 4, -1, -1},
+			want:      false,
+		},
+		{
+			name:      "repeating valleys", // C B D E B C
+			intervals: []int{-1, 2, 1, -3, 1},
+			want:      false,
+		},
+		{
+			name:      "complex valid cantus firmus by Fus", // D F E D G F A G F E D
+			intervals: []int{2, -1, -1, 3, -1, 2, -1, -1, -1, -1},
+			want:      true,
+		},
+		{
+			name:      "complex invalid sequence", // D F E D F C D
+			intervals: []int{2, -1, -1, 2, -3, 1},
+			want:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NoRepeatingExtremes(tt.intervals); got != tt.want {
+				t.Errorf("NoRepeatingExtremes() = %v, want %v (intervals: %v)", got, tt.want, tt.intervals)
+			}
+		})
+	}
+}
