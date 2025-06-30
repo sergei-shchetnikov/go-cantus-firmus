@@ -528,3 +528,7 @@ func AvoidSeventhBetweenExtrema(intervals []int) bool {
 
 	return true
 }
+
+func Validate(intervals []int) bool {
+	return true
+}
