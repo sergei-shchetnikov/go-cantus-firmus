@@ -832,3 +832,72 @@ func TestMinDirectionChanges(t *testing.T) {
 		})
 	}
 }
+
+// TODO: fix cases
+func TestValidateClimax(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "single climax, all heights are >= 0",
+			intervals: []int{1, 1, 2, -1, -2, -1}, // C D E G F D C
+			want:      true,
+		},
+		{
+			name:      "multiple climaxes, all heights are >= 0",
+			intervals: []int{1, 2, -1, 1, -2, -1}, // C D F E F D C
+			want:      false,
+		},
+		{
+			name:      "single climax, all heights are <= 0",
+			intervals: []int{-1, -1, -1, 1, 1, 1}, // C4 B3 A3 G3 A3 B3 C4
+			want:      true,
+		},
+		{
+			name:      "multiple climaxes, all heights are <= 0",
+			intervals: []int{-2, -1, 1, -1, 2, 1}, // C4 A3 G3 A3 G3 B3 C4
+			want:      false,
+		},
+		{
+			name:      "single max and min",
+			intervals: []int{-1, -1, 5, -1, -2}, // C4 B3 A3 F4 E4 C4
+			want:      true,
+		},
+		{
+			name:      "Mixed heights - multiple max",
+			intervals: []int{-1, 1, 3, -1, 1, -2, -1}, // C4 B3 C4 F4 E4 F4 D4 C4
+			want:      false,
+		},
+		{
+			name:      "Mixed heights - multiple min",
+			intervals: []int{-2, -2, 1, 1, -2, 3, 1, 1, -1}, // C4 A3 F3 G3 A3 F3 B3 C4 D4 C4
+			want:      false,
+		},
+		{
+			name:      "Empty sequence",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "Single interval - positive",
+			intervals: []int{1},
+			want:      true,
+		},
+		{
+			name:      "Single interval - negative",
+			intervals: []int{-1},
+			want:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ValidateClimax(tt.intervals)
+			if got != tt.want {
+				t.Errorf("ValidateClimax() = %v, want %v for sequence %v", got, tt.want, tt.intervals)
+			}
+		})
+	}
+}

@@ -552,3 +552,83 @@ func MinDirectionChanges(intervals []int) bool {
 
 	return directionChanges >= 2
 }
+
+// ValidateClimax checks the climax rules for the cantus firmus:
+// - If all heights are >= 0 (relative to starting note), there should be exactly one maximum
+// - If all heights are <= 0, there should be exactly one minimum
+// - If heights are both positive and negative, there should be exactly one maximum and one minimum
+func ValidateClimax(intervals []int) bool {
+	if len(intervals) == 0 {
+		return true
+	}
+
+	// Build partial sums (note heights relative to starting note)
+	partialSums := make([]int, len(intervals)+1)
+	partialSums[0] = 0
+	for i, interval := range intervals {
+		partialSums[i+1] = partialSums[i] + interval
+	}
+
+	allPositive := true
+	allNegative := true
+	for _, sum := range partialSums {
+		if sum < 0 {
+			allPositive = false
+		}
+		if sum > 0 {
+			allNegative = false
+		}
+	}
+
+	if allPositive {
+		return countMaxima(partialSums) == 1
+	}
+
+	if allNegative {
+		return countMinima(partialSums) == 1
+	}
+
+	return countMaxima(partialSums) == 1 && countMinima(partialSums) == 1
+}
+
+// countMaxima counts how many times the maximum value appears in the slice
+func countMaxima(sums []int) int {
+	if len(sums) == 0 {
+		return 0
+	}
+
+	maxVal := sums[0]
+	count := 0
+
+	for _, val := range sums {
+		if val > maxVal {
+			maxVal = val
+			count = 1
+		} else if val == maxVal {
+			count++
+		}
+	}
+
+	return count
+}
+
+// countMinima counts how many times the minimum value appears in the slice
+func countMinima(sums []int) int {
+	if len(sums) == 0 {
+		return 0
+	}
+
+	minVal := sums[0]
+	count := 0
+
+	for _, val := range sums {
+		if val < minVal {
+			minVal = val
+			count = 1
+		} else if val == minVal {
+			count++
+		}
+	}
+
+	return count
+}
