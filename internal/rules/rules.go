@@ -529,6 +529,26 @@ func AvoidSeventhBetweenExtrema(intervals []int) bool {
 	return true
 }
 
-func Validate(intervals []int) bool {
-	return true
+// MinDirectionChanges checks that the melody changes direction (ascending/descending)
+// at least twice in the complete interval sequence.
+// Returns:
+//   - false if there are less than 2 direction changes
+//   - true otherwise
+func MinDirectionChanges(intervals []int) bool {
+	if len(intervals) < 3 {
+		return false // Need at least 3 intervals to have 2 direction changes
+	}
+
+	directionChanges := 0
+	prevSign := sign(intervals[0])
+
+	for i := 1; i < len(intervals); i++ {
+		currentSign := sign(intervals[i])
+		if currentSign != prevSign {
+			directionChanges++
+			prevSign = currentSign
+		}
+	}
+
+	return directionChanges >= 2
 }

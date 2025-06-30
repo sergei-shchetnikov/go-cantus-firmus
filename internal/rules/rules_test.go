@@ -770,3 +770,65 @@ func TestAvoidSeventhBetweenExtrema(t *testing.T) {
 		})
 	}
 }
+
+func TestMinDirectionChanges(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "empty slice",
+			intervals: []int{},
+			want:      false,
+		},
+		{
+			name:      "single interval",
+			intervals: []int{1},
+			want:      false,
+		},
+		{
+			name:      "two intervals, same direction",
+			intervals: []int{1, 2},
+			want:      false,
+		},
+		{
+			name:      "two intervals, different directions",
+			intervals: []int{1, -1},
+			want:      false, // still only 1 change (need at least 2)
+		},
+		{
+			name:      "three intervals, two changes",
+			intervals: []int{1, -1, 1},
+			want:      true,
+		},
+		{
+			name:      "four intervals, one change",
+			intervals: []int{1, 2, 3, -1},
+			want:      false,
+		},
+		{
+			name:      "complex melody with multiple changes",
+			intervals: []int{1, -2, 3, -1, 2, -3, 1},
+			want:      true,
+		},
+		{
+			name:      "all same direction",
+			intervals: []int{1, 1, 1, 1, 1},
+			want:      false,
+		},
+		{
+			name:      "alternating directions",
+			intervals: []int{1, -1, 1, -1, 1},
+			want:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := MinDirectionChanges(tt.intervals); got != tt.want {
+				t.Errorf("MinDirectionChanges() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

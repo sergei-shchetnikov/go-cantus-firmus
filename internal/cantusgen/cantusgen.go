@@ -25,7 +25,7 @@ var cantusValidators = []rules.ValidationFunc{
 // Validation functions that require complete slices (length n) to evaluate
 // These rules check structural properties that only make sense for complete compositions
 var completeCantusValidators = []rules.ValidationFunc{
-	rules.Validate,
+	rules.MinDirectionChanges,
 }
 
 // GenerateCantus generates a set of integer slices of length n,
