@@ -579,3 +579,70 @@ func TestNoTripleAlternatingNote(t *testing.T) {
 		})
 	}
 }
+
+func TestNoNoteRepetitionAfterLeap(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "empty slice",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "single interval",
+			intervals: []int{3},
+			want:      true,
+		},
+		{
+			name:      "equal leaps opposite direction",
+			intervals: []int{3, -3},
+			want:      false,
+		},
+		{
+			name:      "equal leaps same direction",
+			intervals: []int{3, 3},
+			want:      true,
+		},
+		{
+			name:      "unequal leaps opposite direction",
+			intervals: []int{3, -4},
+			want:      true,
+		},
+		{
+			name:      "thirds",
+			intervals: []int{2, -2},
+			want:      false,
+		},
+		{
+			name:      "large equal leaps opposite direction",
+			intervals: []int{-5, 5},
+			want:      false,
+		},
+		{
+			name:      "multiple intervals no violation",
+			intervals: []int{3, 2, -3, 1, 4, -2},
+			want:      true,
+		},
+		{
+			name:      "violation in middle",
+			intervals: []int{2, 3, -3, 1, 4},
+			want:      false,
+		},
+		{
+			name:      "violation at end",
+			intervals: []int{1, 2, 4, -4},
+			want:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NoNoteRepetitionAfterLeap(tt.intervals); got != tt.want {
+				t.Errorf("NoNoteRepetitionAfterLeap() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -17,6 +17,7 @@ var cantusValidators = []rules.ValidationFunc{
 	rules.PreparedLeaps,
 	rules.ValidateLeapResolution,
 	rules.NoTripleAlternatingNote,
+	rules.NoNoteRepetitionAfterLeap,
 }
 
 // GenerateCantus generates a set of integer slices of length n,

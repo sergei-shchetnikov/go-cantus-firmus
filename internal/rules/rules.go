@@ -416,3 +416,29 @@ func NoTripleAlternatingNote(intervals []int) bool {
 
 	return true
 }
+
+// NoNoteRepetitionAfterLeap checks that there is no immediate note repetition after
+// two consecutive leaps of equal magnitude in opposite directions.
+// Returns false if two consecutive intervals:
+//   - have absolute value > 1 (leaps)
+//   - have opposite signs
+//   - have equal absolute values
+func NoNoteRepetitionAfterLeap(intervals []int) bool {
+	if len(intervals) < 2 {
+		return true
+	}
+
+	for i := 0; i < len(intervals)-1; i++ {
+		current := intervals[i]
+		next := intervals[i+1]
+
+		if abs(current) > 1 &&
+			abs(next) > 1 &&
+			sign(current) == -sign(next) &&
+			abs(current) == abs(next) {
+			return false
+		}
+	}
+
+	return true
+}
