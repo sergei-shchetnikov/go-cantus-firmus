@@ -485,3 +485,46 @@ func NoRepeatingExtremes(intervals []int) bool {
 
 	return true
 }
+
+// AvoidSeventhBetweenExtrema checks that no adjacent extrema (peaks/valleys, including first/last notes)
+// in the cantus firmus are separated by a seventh (interval of 6).
+// Returns:
+//   - false if any adjacent extrema differ by a seventh (rule violated)
+//   - true otherwise (rule satisfied)
+func AvoidSeventhBetweenExtrema(intervals []int) bool {
+	if len(intervals) < 1 {
+		return true
+	}
+
+	// Build partial sums (note heights)
+	partialSums := make([]int, len(intervals)+1)
+	partialSums[0] = 0
+	for i, interval := range intervals {
+		partialSums[i+1] = partialSums[i] + interval
+	}
+
+	// Find all local extrema, including first and last notes
+	extrema := make([]int, 0)
+	extrema = append(extrema, partialSums[0]) // Include first note
+
+	for i := 1; i < len(partialSums)-1; i++ {
+		prev := partialSums[i-1]
+		current := partialSums[i]
+		next := partialSums[i+1]
+
+		// Check for peak or valley
+		if (current > prev && current > next) || (current < prev && current < next) {
+			extrema = append(extrema, current)
+		}
+	}
+
+	extrema = append(extrema, partialSums[len(partialSums)-1]) // Include last note
+
+	for i := 0; i < len(extrema)-1; i++ {
+		if abs(extrema[i]-extrema[i+1]) == 6 {
+			return false
+		}
+	}
+
+	return true
+}

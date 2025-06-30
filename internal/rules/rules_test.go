@@ -713,3 +713,60 @@ func TestNoRepeatingExtremes(t *testing.T) {
 		})
 	}
 }
+
+func TestAvoidSeventhBetweenExtrema(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "Empty slice",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "Single interval (no extrema)",
+			intervals: []int{2},
+			want:      true,
+		},
+		{
+			name:      "seventh between the first and last note",
+			intervals: []int{2, 2, 2}, // C E G B
+			want:      false,
+		},
+		{
+			name:      "Seventh between first note and first peak",
+			intervals: []int{6, -1}, // C B A
+			want:      false,
+		},
+		{
+			name:      "Seventh between adjacent extrema",
+			intervals: []int{1, -1, 1, 5, -1, -1, -1}, // C D C D B A G F
+			want:      false,
+		},
+		{
+			name:      "Seventh between last note and previous extremum",
+			intervals: []int{1, 1, -2, 6}, // C D E C B
+			want:      false,
+		},
+		{
+			name:      "Valid melody by Fux (no sevenths)",
+			intervals: []int{2, -1, -1, 3, -1, 2, -1, -1, -1, -1}, // D F E D G F A G F E D
+			want:      true,
+		},
+		{
+			name:      "Large leap but not seventh",
+			intervals: []int{7, -7},
+			want:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := AvoidSeventhBetweenExtrema(tt.intervals); got != tt.want {
+				t.Errorf("AvoidSeventhBetweenExtrema() = %v, want %v (intervals: %v)", got, tt.want, tt.intervals)
+			}
+		})
+	}
+}
