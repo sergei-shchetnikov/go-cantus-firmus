@@ -20,10 +20,10 @@ var cantusValidators = []rules.ValidationFunc{
 	rules.NoNoteRepetitionAfterLeap,
 	rules.NoRepeatingExtremes,
 	rules.AvoidSeventhBetweenExtrema,
+	rules.NoTwoNoteSequences,
 }
 
 // Validation functions that require complete slices (length n) to evaluate
-// These rules check structural properties that only make sense for complete compositions
 var completeCantusValidators = []rules.ValidationFunc{
 	rules.MinDirectionChanges,
 	rules.ValidateClimax,
@@ -32,39 +32,37 @@ var completeCantusValidators = []rules.ValidationFunc{
 // GenerateCantus generates a set of integer slices of length n,
 // satisfying specific contrapuntal and structural conditions:
 //   - The sum of all intervals in the complete slice equals 0 (returns to starting pitch)
-//   - Approximately 70% of intervals are step motions (values from {-1, 1})
 //   - The slice always ends with two step motions (values from {-1, 1})
 //   - All slices adhere to both partial (cantusValidators) and complete (completeCantusValidators) rules
+//
+// Parameters:
+//   - n: length of the melody
+//   - allowedLeaps: slice of integers specifying allowed number of leaps (e.g. []int{2,3,4})
 //
 // The function uses recursive backtracking with these optimization strategies:
 //   - Early pruning of invalid partial melodies using cantusValidators
 //   - Final validation of complete melodies using completeCantusValidators
-//   - Step/leap ratio enforcement throughout generation
-func GenerateCantus(n int) [][]int {
+func GenerateCantus(n int, allowedLeaps []int) [][]int {
 	if n < 2 {
 		return nil
 	}
 
 	var result [][]int
 
-	// Calculate required step/leap distribution (70% steps)
-	requiredSteps := int(float64(n) * 0.7)
-	requiredLeaps := n - requiredSteps
+	// Convert allowedLeaps to a map for faster lookup
+	leapCounts := make(map[int]bool)
+	for _, count := range allowedLeaps {
+		if count >= 0 && count <= n-2 { // -2 because last two must be steps
+			leapCounts[count] = true
+		}
+	}
 
-	if requiredSteps < 2 || requiredLeaps < 0 {
+	if len(leapCounts) == 0 {
 		return nil
 	}
 
-	// Reserve last 2 positions for steps (standard cadence)
-	stepsForPrefix := requiredSteps - 2
-	leapsForPrefix := requiredLeaps
-
-	if stepsForPrefix < 0 {
-		return nil
-	}
-
-	var generatePrefix func(currentIndex int, currentSlice []int, currentSum int, currentStepsCount int, currentLeapsCount int)
-	generatePrefix = func(currentIndex int, currentSlice []int, currentSum int, currentStepsCount int, currentLeapsCount int) {
+	var generatePrefix func(currentIndex int, currentSlice []int, currentSum int, currentLeapsCount int)
+	generatePrefix = func(currentIndex int, currentSlice []int, currentSum int, currentLeapsCount int) {
 		// Validate partial melody against partial rules
 		if !rules.AllRules(currentSlice, cantusValidators) {
 			return
@@ -72,6 +70,11 @@ func GenerateCantus(n int) [][]int {
 
 		// When we reach the position where we need to add the final two steps
 		if currentIndex == n-2 {
+			// Check if current leaps count is in allowed counts
+			if !leapCounts[currentLeapsCount] {
+				return
+			}
+
 			for _, end1Val := range steps {
 				for _, end2Val := range steps {
 					finalSlice := make([]int, n)
@@ -96,25 +99,36 @@ func GenerateCantus(n int) [][]int {
 			return
 		}
 
-		// Continue building melody with steps if we haven't used our step quota
-		if currentStepsCount < stepsForPrefix {
+		// Try adding a step (if we can still have steps)
+		if (n - 2 - currentLeapsCount) > 0 { // -2 for final two steps
 			for _, val := range steps {
 				nextSlice := append(currentSlice, val)
-				generatePrefix(currentIndex+1, nextSlice, currentSum+val, currentStepsCount+1, currentLeapsCount)
+				generatePrefix(currentIndex+1, nextSlice, currentSum+val, currentLeapsCount)
 			}
 		}
 
-		// Continue building melody with leaps if we haven't used our leap quota
-		if currentLeapsCount < leapsForPrefix {
+		// Try adding a leap (if we haven't exceeded allowed leaps)
+		if currentLeapsCount < maxKey(leapCounts) {
 			for _, val := range leaps {
 				nextSlice := append(currentSlice, val)
-				generatePrefix(currentIndex+1, nextSlice, currentSum+val, currentStepsCount, currentLeapsCount+1)
+				generatePrefix(currentIndex+1, nextSlice, currentSum+val, currentLeapsCount+1)
 			}
 		}
 	}
 
 	// Start generation with empty slice
-	generatePrefix(0, []int{}, 0, 0, 0)
+	generatePrefix(0, []int{}, 0, 0)
 
 	return result
+}
+
+// Helper function to get maximum key from leapCounts map
+func maxKey(m map[int]bool) int {
+	max := 0
+	for k := range m {
+		if k > max {
+			max = k
+		}
+	}
+	return max
 }
