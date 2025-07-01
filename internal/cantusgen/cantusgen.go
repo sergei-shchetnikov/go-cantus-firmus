@@ -36,7 +36,7 @@ var completeCantusValidators = []rules.ValidationFunc{
 //   - All slices adhere to both partial (cantusValidators) and complete (completeCantusValidators) rules
 //
 // Parameters:
-//   - n: length of the melody
+//   - n: the number of intervals between adjacent pairs of notes in cantus firmus
 //   - allowedLeaps: slice of integers specifying allowed number of leaps (e.g. []int{2,3,4})
 //
 // The function uses recursive backtracking with these optimization strategies:
