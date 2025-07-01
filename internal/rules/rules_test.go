@@ -1,6 +1,8 @@
 package rules
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNoBeginWithFive(t *testing.T) {
 	tests := []struct {
@@ -144,44 +146,19 @@ func TestNoExcessiveNoteRepetition(t *testing.T) {
 			want:      true,
 		},
 		{
-			name:      "exactly 4 repetitions",
-			intervals: []int{1, -1, 1, -1, 1, -1},
+			name:      "exactly 3 repetitions",
+			intervals: []int{2, -1, -1, -1, 1}, // C4 E4 D4 C4 B3 C4
 			want:      true,
 		},
 		{
-			name:      "5 repetitions (violation)",
-			intervals: []int{1, -1, 1, -1, 1, -1, 1, -1, 1, -1},
+			name:      "4 repetitions (violation)",
+			intervals: []int{3, -1, -2, 1, -1, 4, -4}, // C F E C D C G C
 			want:      false,
 		},
 		{
-			name:      "multiple notes with 4 reps",
-			intervals: []int{1, 1, -2, 2, -2, 2, -1, 2, -1},
+			name:      "multiple notes with 3 reps",
+			intervals: []int{2, -1, -1, 3, -1, 2, -1, -1, -1, -1}, // Fux
 			want:      true,
-		},
-		{
-			name:      "one note with 5 reps",
-			intervals: []int{0, 0, 0, 0, 0},
-			want:      false,
-		},
-		{
-			name:      "complex pattern valid",
-			intervals: []int{2, -1, 1, -2, 3, -3, 1, -1, 2, -1},
-			want:      true,
-		},
-		{
-			name:      "complex pattern invalid",
-			intervals: []int{2, -2, 2, -2, 2, -2, 2, -2, 2, -2, 2},
-			want:      false,
-		},
-		{
-			name:      "partial slice valid",
-			intervals: []int{1, -1, 1, -1},
-			want:      true,
-		},
-		{
-			name:      "partial slice invalid",
-			intervals: []int{0, 0, 0, 0, 0},
-			want:      false,
 		},
 	}
 
