@@ -20,7 +20,7 @@ var cantusValidators = []rules.ValidationFunc{
 	rules.NoNoteRepetitionAfterLeap,
 	rules.NoRepeatingExtremes,
 	rules.AvoidSeventhBetweenExtrema,
-	rules.NoTwoNoteSequences,
+	rules.NoSequences,
 }
 
 // Validation functions that require complete slices (length n) to evaluate

@@ -42,7 +42,7 @@ func selectRandomItems[T any](items []T, count int) []T {
 // 3. Exports to MusicXML format
 func main() {
 	// Generate cantus firmus melodies of length 10
-	generated := cantusgen.GenerateCantus(10)
+	generated := cantusgen.GenerateCantus(10, []int{2, 3, 4})
 	fmt.Printf("Generated %d cantus firmus melodies\n", len(generated))
 
 	if len(generated) == 0 {
@@ -50,7 +50,7 @@ func main() {
 	}
 
 	// Select up to 10 random melodies
-	selected := selectRandomItems(generated, 10)
+	selected := selectRandomItems(generated, 20)
 
 	// Convert each melody to A minor realization
 	var sequences [][]musicxml.Note

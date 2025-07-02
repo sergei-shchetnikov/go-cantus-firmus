@@ -878,3 +878,99 @@ func TestValidateClimax(t *testing.T) {
 		})
 	}
 }
+
+func TestNoSequences(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "Empty slice",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "Too short for any pattern",
+			intervals: []int{1, 2},
+			want:      true,
+		},
+		// Part a) Alternating pattern tests
+		{
+			name:      "Alternating pattern a,b,a,b,a",
+			intervals: []int{1, -1, 1, -1, 1},
+			want:      false,
+		},
+		{
+			name:      "Alternating pattern with different values",
+			intervals: []int{2, -1, 2, -1, 2},
+			want:      false,
+		},
+		{
+			name:      "Not alternating (a == b)",
+			intervals: []int{1, 1, 1, 1, 1},
+			want:      true,
+		},
+		// Part b) Consecutive patterns with one-element separation
+		{
+			name:      "Consecutive patterns with separation",
+			intervals: []int{1, 2, 3, 0, 1, 2, 3},
+			want:      false,
+		},
+		{
+			name:      "Consecutive patterns with leap separation",
+			intervals: []int{4, -2, 3, 5, 4, -2, 3},
+			want:      false,
+		},
+		{
+			name:      "Longer sequence with multiple repeats",
+			intervals: []int{2, 3, -1, 0, 2, 3, -1, 0, 2, 3, -1},
+			want:      false,
+		},
+		{
+			name:      "Longer sequence. No repeating patterns",
+			intervals: []int{2, 3, -1, 1, 5, 2, 3, -1, 2, 1, 2, 3, -1},
+			want:      true,
+		},
+		// Part c) Leap pattern repetition tests
+		{
+			name:      "Repeating leap pattern",
+			intervals: []int{3, -2, 4, 1, 3, -2, 4, 1},
+			want:      false,
+		},
+		{
+			name:      "Repeating leap pattern with different surrounding",
+			intervals: []int{1, 3, -2, 4, -1, -1, 2, 3, -2, 4, -1, -1, 2},
+			want:      false,
+		},
+		{
+			name:      "No repeating patterns",
+			intervals: []int{1, 2, -1, 3, -2, 4, -3},
+			want:      true,
+		},
+		{
+			name:      "Leaps but no repetition",
+			intervals: []int{3, -2, 4, 2, -3, 5, -4},
+			want:      true,
+		},
+		// Edge cases
+		{
+			name:      "Almost alternating but not quite",
+			intervals: []int{1, -1, 1, -1, 2},
+			want:      true,
+		},
+		{
+			name:      "Almost consecutive pattern but different",
+			intervals: []int{1, 2, 3, 1, 2, 4},
+			want:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NoSequences(tt.intervals); got != tt.want {
+				t.Errorf("NoRepeatingPatterns() = %v, want %v for case %v", got, tt.want, tt.intervals)
+			}
+		})
+	}
+}

@@ -632,3 +632,145 @@ func countMinima(sums []int) int {
 
 	return count
 }
+
+// NoSequences prohibits any repeating patterns in the cantus firmus.
+// The logic is divided into three parts:
+// a) If the interval slice contains a pattern ..., a, b, a, b, a, ... where a != b, return false immediately
+// b) If there are consecutive three-element patterns separated by one element (..., a, b, c, d, a, b, c, ...), return false
+// c) Search for other three-element patterns containing leaps and check for their repetition
+func NoSequences(intervals []int) bool {
+	// Part a) Check for alternating a, b, a, b, a pattern
+	if hasAlternatingPattern(intervals) {
+		return false
+	}
+
+	// Part b) Check for consecutive patterns with one-element separation
+	if hasConsecutivePatterns(intervals) {
+		return false
+	}
+
+	// Part c) Check for repeating leap patterns
+	return !hasRepeatingLeapPatterns(intervals)
+}
+
+// hasAlternatingPattern checks for the presence of a, b, a, b, a pattern where a != b
+func hasAlternatingPattern(intervals []int) bool {
+	if len(intervals) < 5 {
+		return false
+	}
+
+	for i := 0; i <= len(intervals)-5; i++ {
+		a := intervals[i]
+		b := intervals[i+1]
+		if a == b {
+			continue // a and b must be different
+		}
+
+		// Check for a, b, a, b, a pattern
+		if intervals[i+2] == a && intervals[i+3] == b && intervals[i+4] == a {
+			return true
+		}
+	}
+
+	return false
+}
+
+// hasConsecutivePatterns checks for consecutive three-element patterns separated by one element
+func hasConsecutivePatterns(intervals []int) bool {
+	if len(intervals) < 7 {
+		return false
+	}
+
+	for i := 0; i <= len(intervals)-7; i++ {
+		a1 := intervals[i]
+		b1 := intervals[i+1]
+		c1 := intervals[i+2]
+		_ = intervals[i+3] // separator element (any value)
+		a2 := intervals[i+4]
+		b2 := intervals[i+5]
+		c2 := intervals[i+6]
+
+		// Check if the two triplets match with one element in between
+		if a1 == a2 && b1 == b2 && c1 == c2 {
+			return true
+		}
+	}
+
+	return false
+}
+
+// hasRepeatingLeapPatterns checks for repeating patterns containing leaps
+func hasRepeatingLeapPatterns(intervals []int) bool {
+	if len(intervals) < 3 {
+		return false
+	}
+
+	leaps := map[int]bool{-4: true, -3: true, -2: true, 2: true, 3: true, 4: true, 5: true}
+
+	// Collect all potential patterns (triplets) with at least one leap and not all equal
+	patterns := make([][3]int, 0)
+	patternIndices := make([]int, 0) // Store starting indices of patterns
+
+	for i := 0; i <= len(intervals)-3; i++ {
+		a := intervals[i]
+		b := intervals[i+1]
+		c := intervals[i+2]
+
+		// Verify at least two elements are different and at least one is a leap
+		if (a != b || b != c) && (leaps[a] || leaps[b] || leaps[c]) {
+			patterns = append(patterns, [3]int{a, b, c})
+			patternIndices = append(patternIndices, i)
+		}
+	}
+
+	// Look for repeating patterns
+	for i := 0; i < len(patterns); i++ {
+		for j := i + 1; j < len(patterns); j++ {
+			if patterns[i] == patterns[j] {
+				// Found repeating pattern
+				start1 := patternIndices[i]
+				start2 := patternIndices[j]
+
+				// Extend first pattern up to the start of the second
+				extended1 := extendPattern(intervals, start1, start2)
+				if len(extended1) == 0 {
+					continue // Not enough elements for comparison
+				}
+
+				// Extend second pattern to match the length of the first
+				extended2 := extendPattern(intervals, start2, start2+len(extended1))
+				if len(extended2) != len(extended1) {
+					continue // Not enough elements for comparison
+				}
+
+				// Compare the extended patterns
+				if equalSlices(extended1, extended2) {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+// extendPattern extends the pattern from start to end using elements from intervals
+func extendPattern(intervals []int, start, end int) []int {
+	if end > len(intervals) {
+		return nil // Not enough elements to extend
+	}
+	return intervals[start:end]
+}
+
+// equalSlices checks if two slices are equal
+func equalSlices(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
