@@ -27,6 +27,7 @@ var cantusValidators = []rules.ValidationFunc{
 var completeCantusValidators = []rules.ValidationFunc{
 	rules.MinDirectionChanges,
 	rules.ValidateClimax,
+	rules.AvoidSeventhNinthBetweenExtremes,
 }
 
 // GenerateCantus generates a set of integer slices of length n,

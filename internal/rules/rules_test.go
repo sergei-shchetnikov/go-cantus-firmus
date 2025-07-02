@@ -974,3 +974,81 @@ func TestNoSequences(t *testing.T) {
 		})
 	}
 }
+
+func TestAvoidSeventhNinthBetweenExtremes(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "Empty slice",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "Single step up",
+			intervals: []int{1},
+			want:      true,
+		},
+		{
+			name:      "Single step down",
+			intervals: []int{-1},
+			want:      true,
+		},
+		{
+			name:      "Simple valid melody",
+			intervals: []int{1, 1, -1, -1},
+			want:      true,
+		},
+		{
+			name:      "Seventh above tonic (6)",
+			intervals: []int{1, 1, 1, 1, 1, 1}, // 0 → 6 (seventh)
+			want:      false,
+		},
+		{
+			name:      "Ninth above tonic (8)",
+			intervals: []int{1, 1, 1, 1, 1, 1, 1, 1}, // 0 → 8 (ninth)
+			want:      false,
+		},
+		{
+			name:      "Seventh below tonic (-6)",
+			intervals: []int{-1, -1, -1, -1, -1, -1}, // 0 → -6 (seventh)
+			want:      false,
+		},
+		{
+			name:      "Ninth below tonic (-8)",
+			intervals: []int{-1, -1, -1, -1, -1, -1, -1, -1}, // 0 → -8 (ninth)
+			want:      false,
+		},
+		{
+			name:      "Seventh between extremes (6)",
+			intervals: []int{3, 3, -3, -3}, // 0 → 3 → 6 → 3 → 0 (max-min = 6)
+			want:      false,
+		},
+		{
+			name:      "Ninth between extremes (8)",
+			intervals: []int{4, 4, -4, -4}, // 0 → 4 → 8 → 4 → 0 (max-min = 8)
+			want:      false,
+		},
+		{
+			name:      "Valid with octave jump (7)",
+			intervals: []int{7, -7}, // 0 → 7 → 0 (octave is allowed)
+			want:      true,
+		},
+		{
+			name:      "Complex valid melody by Schenker",
+			intervals: []int{1, 2, -1, 1, 1, 1, -1, -2, -1, -1},
+			want:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := AvoidSeventhNinthBetweenExtremes(tt.intervals); got != tt.want {
+				t.Errorf("AvoidSeventhNinthBetweenExtremes() = %v, want %v for intervals %v",
+					got, tt.want, tt.intervals)
+			}
+		})
+	}
+}

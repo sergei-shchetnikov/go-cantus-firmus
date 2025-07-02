@@ -774,3 +774,58 @@ func equalSlices(a, b []int) bool {
 	}
 	return true
 }
+
+// AvoidSeventhNinthBetweenExtremes checks that there are no seventh (6) or ninth (8) intervals
+// between the tonic and extreme notes (highest, lowest).
+// This function should only be applied to complete interval slices.
+//
+// Logic:
+//   - Builds partial sums slice (notes relative to tonic)
+//   - Checks:
+//     1. If maximum is multiple of 6 or 8 - false (seventh/ninth between tonic and highest note)
+//     2. If minimum is multiple of 6 or 8 - false (seventh/ninth between tonic and lowest note)
+//     3. If difference between max and min is multiple of 6 or 8 - false (seventh/ninth between extremes)
+//   - Returns true in all other cases
+func AvoidSeventhNinthBetweenExtremes(intervals []int) bool {
+	if len(intervals) == 0 {
+		return true
+	}
+
+	// Build partial sums (notes relative to tonic)
+	partialSums := make([]int, len(intervals)+1)
+	partialSums[0] = 0
+	for i, interval := range intervals {
+		partialSums[i+1] = partialSums[i] + interval
+	}
+
+	// Find maximum and minimum
+	maxSum := partialSums[0]
+	minSum := partialSums[0]
+	for _, sum := range partialSums {
+		if sum > maxSum {
+			maxSum = sum
+		}
+		if sum < minSum {
+			minSum = sum
+		}
+	}
+
+	// Check conditions
+	if isMultipleOfSixOrEight(maxSum) {
+		return false
+	}
+	if isMultipleOfSixOrEight(minSum) {
+		return false
+	}
+	if isMultipleOfSixOrEight(maxSum - minSum) {
+		return false
+	}
+
+	return true
+}
+
+// isMultipleOfSixOrEight checks if a number is multiple of 6 or 8 (absolute value)
+func isMultipleOfSixOrEight(x int) bool {
+	absX := abs(x)
+	return absX == 6 || absX == 8 || absX == 12 || absX == 16 // etc. for larger octaves
+}
