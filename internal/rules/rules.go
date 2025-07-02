@@ -72,10 +72,10 @@ func sign(x int) int {
 }
 
 // NoExcessiveNoteRepetition checks that no single note (as represented by cumulative interval sum)
-// appears more than 4 times in the cantus firmus. Works with partial slices during generation.
+// appears more than 3 times in the cantus firmus. Works with partial slices during generation.
 //
 // Returns:
-//   - false if any note repeats more than 4 times (rule violated)
+//   - false if any note repeats more than 3 times (rule violated)
 //   - true otherwise (rule satisfied)
 func NoExcessiveNoteRepetition(intervals []int) bool {
 	if len(intervals) == 0 {
@@ -90,7 +90,7 @@ func NoExcessiveNoteRepetition(intervals []int) bool {
 		currentSum += interval
 		sumCounts[currentSum]++
 
-		if sumCounts[currentSum] > 4 {
+		if sumCounts[currentSum] > 3 {
 			return false
 		}
 	}
