@@ -1,7 +1,6 @@
 package music
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -13,91 +12,6 @@ func Mod7(n int) int {
 		result += 7
 	}
 	return result
-}
-
-// Note represents a musical note
-//
-// Fields:
-//   - Step: diatonic step number (0 = C, 1 = D, ..., 6 = B)
-//   - Octave: octave number (4 is the middle octave)
-//   - Alteration: accidental for the note (-1 = flat, 0 = natural, 1 = sharp)
-type Note struct {
-	Step       int
-	Octave     int
-	Alteration int
-}
-
-// String returns the string representation of the note in standard musical notation.
-// The step numbers are mapped to diatonic note names (0=C, 1=D, ..., 6=B).
-// Octave numbers follow scientific pitch notation.
-// Alteration affects the note name:
-//
-//	-1 → flat (represented as "b")
-//	 0 → natural (no symbol)
-//	 1 → sharp (represented as "#")
-//
-// Examples:
-//   - Note{0, 4, 0}  → "C4" (Middle C)
-//   - Note{0, 4, 1}  → "C#4" (C sharp)
-//   - Note{1, 4, -1} → "Db4" (D flat)
-//   - Note{6, 3, 0}  → "B3" (B below Middle C)
-func (n Note) String() string {
-	noteNames := []string{"C", "D", "E", "F", "G", "A", "B"}
-	alterationSymbol := ""
-	switch n.Alteration {
-	case 1:
-		alterationSymbol = "#"
-	case -1:
-		alterationSymbol = "b"
-	}
-	return fmt.Sprintf("%s%s%d", noteNames[n.Step], alterationSymbol, n.Octave)
-}
-
-// ParseNote parses a string representation of a musical note into a Note struct.
-// Alterations are not supported.
-//
-// Examples of valid input:
-//   - "C4" (Middle C)
-//   - "G3" (G below middle C)
-//
-// Returns:
-//   - Note struct if parsing is successful
-//   - error if the format is invalid (with specific reason)
-func ParseNote(s string) (Note, error) {
-	if len(s) < 2 {
-		return Note{}, errors.New("invalid note format: string too short")
-	}
-
-	noteChar := s[0]
-	octaveStr := s[1:]
-
-	var step int
-	switch noteChar {
-	case 'C', 'c':
-		step = 0
-	case 'D', 'd':
-		step = 1
-	case 'E', 'e':
-		step = 2
-	case 'F', 'f':
-		step = 3
-	case 'G', 'g':
-		step = 4
-	case 'A', 'a':
-		step = 5
-	case 'B', 'b':
-		step = 6
-	default:
-		return Note{}, fmt.Errorf("invalid note character: %c", noteChar)
-	}
-
-	var octave int
-	_, err := fmt.Sscanf(octaveStr, "%d", &octave)
-	if err != nil {
-		return Note{}, fmt.Errorf("invalid octave: %v", err)
-	}
-
-	return Note{Step: step, Octave: octave}, nil
 }
 
 // Interval represents a musical interval using Taneyev's digital notation system.
@@ -168,23 +82,6 @@ func (i Interval) String() string {
 	}
 
 	return fmt.Sprintf("%d%s %s", intervalNum, suffix, direction)
-}
-
-// Transpose transposes a note by the given interval.
-func Transpose(n Note, i Interval) Note {
-	stepDelta := int(i)
-	totalSteps := n.Step + stepDelta
-	newStep := Mod7(totalSteps)
-
-	octaveDelta := totalSteps / 7
-	if totalSteps < 0 && newStep != 0 {
-		octaveDelta -= 1
-	}
-
-	return Note{
-		Step:   newStep,
-		Octave: n.Octave + octaveDelta,
-	}
 }
 
 // CantusFirmus represents a melodic contour abstracted from rhythm, meter, key, or specific pitches.

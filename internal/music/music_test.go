@@ -234,63 +234,39 @@ func TestParseNote(t *testing.T) {
 		input   string
 		want    Note
 		wantErr bool
-		errText string
 	}{
-		{
-			name:  "valid note C4",
-			input: "C4",
-			want:  Note{Step: 0, Octave: 4},
-		},
-		{
-			name:  "valid note lowercase a5",
-			input: "a5",
-			want:  Note{Step: 5, Octave: 5},
-		},
-		{
-			name:  "valid note B3",
-			input: "B3",
-			want:  Note{Step: 6, Octave: 3},
-		},
-		{
-			name:    "empty string",
-			input:   "",
-			wantErr: true,
-			errText: "invalid note format: string too short",
-		},
-		{
-			name:    "too short",
-			input:   "A",
-			wantErr: true,
-			errText: "invalid note format: string too short",
-		},
-		{
-			name:    "invalid note char",
-			input:   "X5",
-			wantErr: true,
-			errText: "invalid note character: X",
-		},
+		// Valid notes without alteration
+		{"C4", "C4", Note{0, 4, 0}, false},
+		{"D5", "D5", Note{1, 5, 0}, false},
+		{"lowercase a4", "a4", Note{5, 4, 0}, false},
+		{"E2", "E2", Note{2, 2, 0}, false},
+
+		// Valid notes with alteration
+		{"C#4", "C#4", Note{0, 4, 1}, false},
+		{"Db5", "Db5", Note{1, 5, -1}, false},
+		{"F#3", "F#3", Note{3, 3, 1}, false},
+		{"Gb2", "Gb2", Note{4, 2, -1}, false},
+		{"lowercase with alteration", "ab4", Note{5, 4, -1}, false},
+
+		// Invalid formats
+		{"empty string", "", Note{}, true},
+		{"too short", "C", Note{}, true},
+		{"invalid note char", "H4", Note{}, true},
+		{"invalid alteration", "Cx4", Note{}, true},
+		{"missing octave after alteration", "C#", Note{}, true},
+		{"invalid octave", "CA", Note{}, true},
+		{"double alteration", "C##4", Note{}, true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := ParseNote(tt.input)
-
-			if tt.wantErr {
-				if err == nil {
-					t.Errorf("ParseNote(%q) expected error, got nil", tt.input)
-				} else if tt.errText != "" && err.Error() != tt.errText {
-					t.Errorf("ParseNote(%q) error = %v, wantErr %v", tt.input, err.Error(), tt.errText)
-				}
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseNote() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-
-			if err != nil {
-				t.Errorf("ParseNote(%q) unexpected error: %v", tt.input, err)
-				return
-			}
-
-			if got != tt.want {
-				t.Errorf("ParseNote(%q) = %v, want %v", tt.input, got, tt.want)
+			if !tt.wantErr && got != tt.want {
+				t.Errorf("ParseNote() = %v, want %v", got, tt.want)
 			}
 		})
 	}
