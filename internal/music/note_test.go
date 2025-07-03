@@ -213,3 +213,89 @@ func TestParseNoteEdgeCases(t *testing.T) {
 		})
 	}
 }
+
+func TestIsLeap(t *testing.T) {
+	tests := []struct {
+		name     string
+		n1, n2   Note
+		expected bool
+	}{
+		// Unisons
+		{
+			name:     "unison",
+			n1:       Note{Step: 0, Octave: 4}, // C4
+			n2:       Note{Step: 0, Octave: 4}, // C4
+			expected: false,
+		},
+		// Seconds
+		{
+			name:     "ascending second",
+			n1:       Note{Step: 0, Octave: 4}, // C4
+			n2:       Note{Step: 1, Octave: 4}, // D4
+			expected: false,
+		},
+		{
+			name:     "descending second",
+			n1:       Note{Step: 1, Octave: 4}, // D4
+			n2:       Note{Step: 0, Octave: 4}, // C4
+			expected: false,
+		},
+		{
+			name:     "second across octave",
+			n1:       Note{Step: 6, Octave: 4}, // B4
+			n2:       Note{Step: 0, Octave: 5}, // C5
+			expected: false,
+		},
+
+		// Thirds (leaps)
+		{
+			name:     "ascending third",
+			n1:       Note{Step: 0, Octave: 4}, // C4
+			n2:       Note{Step: 2, Octave: 4}, // E4
+			expected: true,
+		},
+		{
+			name:     "descending third",
+			n1:       Note{Step: 2, Octave: 4}, // E4
+			n2:       Note{Step: 0, Octave: 4}, // C4
+			expected: true,
+		},
+
+		// Larger intervals
+		{
+			name:     "octave leap",
+			n1:       Note{Step: 0, Octave: 4}, // C4
+			n2:       Note{Step: 0, Octave: 5}, // C5
+			expected: true,
+		},
+		{
+			name:     "compound third",
+			n1:       Note{Step: 0, Octave: 4}, // C4
+			n2:       Note{Step: 2, Octave: 5}, // E5
+			expected: true,
+		},
+		{
+			name:     "large descending leap",
+			n1:       Note{Step: 0, Octave: 5}, // C5
+			n2:       Note{Step: 3, Octave: 3}, // F3
+			expected: true,
+		},
+
+		// With alterations (shouldn't affect step calculation)
+		{
+			name:     "augmented second still step",
+			n1:       Note{Step: 0, Octave: 4, Alteration: 0}, // C4
+			n2:       Note{Step: 1, Octave: 4, Alteration: 1}, // D#4
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := IsLeap(tt.n1, tt.n2)
+			if result != tt.expected {
+				t.Errorf("IsLeap(%v, %v) = %v, want %v", tt.n1, tt.n2, result, tt.expected)
+			}
+		})
+	}
+}
