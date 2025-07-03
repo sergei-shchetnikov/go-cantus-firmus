@@ -1052,3 +1052,129 @@ func TestAvoidSeventhNinthBetweenExtremes(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateLeadingTone(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		// Valid cases for -1
+		{
+			name:      "Valid -1 configuration: 0,-1,0",
+			intervals: []int{0, -1, 1}, // partial sums: [0, 0, -1, 0]
+			want:      true,
+		},
+		{
+			name:      "Valid -1 configuration: -2,-1,0",
+			intervals: []int{-2, 1, 1}, // partial sums: [0, -2, -1, 0]
+			want:      true,
+		},
+		{
+			name:      "Valid -1 configuration: 0,-1,-2",
+			intervals: []int{0, -1, -1}, // partial sums: [0, 0, -1, -2]
+			want:      true,
+		},
+
+		// Valid cases for 6
+		{
+			name:      "Valid 6 configuration: 7,6,7",
+			intervals: []int{7, -1, 1}, // partial sums: [0, 7, 6, 7]
+			want:      true,
+		},
+		{
+			name:      "Valid 6 configuration: 5,6,7",
+			intervals: []int{5, 1, 1}, // partial sums: [0, 5, 6, 7]
+			want:      true,
+		},
+		{
+			name:      "Valid 6 configuration: 7,6,5",
+			intervals: []int{7, -1, -1}, // partial sums: [0, 7, 6, 5]
+			want:      true,
+		},
+
+		// Valid cases for -8
+		{
+			name:      "Valid -8 configuration: -7,-8,-7",
+			intervals: []int{-7, -1, 1}, // partial sums: [0, -7, -8, -7]
+			want:      true,
+		},
+		{
+			name:      "Valid -8 configuration: -9,-8,-7",
+			intervals: []int{-9, 1, 1}, // partial sums: [0, -9, -8, -7]
+			want:      true,
+		},
+		{
+			name:      "Valid -8 configuration: -7,-8,-9",
+			intervals: []int{-7, -1, -1}, // partial sums: [0, -7, -8, -9]
+			want:      true,
+		},
+
+		// Invalid cases for -1
+		{
+			name:      "Invalid -1 configuration: standalone",
+			intervals: []int{-1}, // partial sums: [0, -1]
+			want:      false,
+		},
+		{
+			name:      "Invalid -1 configuration: bad neighbors",
+			intervals: []int{1, -2, 0}, // partial sums: [0, 1, -1, -1]
+			want:      false,
+		},
+
+		// Invalid cases for 6
+		{
+			name:      "Invalid 6 configuration: standalone",
+			intervals: []int{6}, // partial sums: [0, 6]
+			want:      false,
+		},
+		{
+			name:      "Invalid 6 configuration: bad neighbors",
+			intervals: []int{6, 0, 0}, // partial sums: [0, 6, 6, 6]
+			want:      false,
+		},
+
+		// Invalid cases for -8
+		{
+			name:      "Invalid -8 configuration: standalone",
+			intervals: []int{-8}, // partial sums: [0, -8]
+			want:      false,
+		},
+		{
+			name:      "Invalid -8 configuration: bad neighbors",
+			intervals: []int{-8, 0, 0}, // partial sums: [0, -8, -8, -8]
+			want:      false,
+		},
+
+		// Edge cases
+		{
+			name:      "Empty slice",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "Single interval not matching special values",
+			intervals: []int{2},
+			want:      true,
+		},
+		{
+			name:      "No special values",
+			intervals: []int{1, 2, -2, 3},
+			want:      true,
+		},
+		{
+			name:      "Multiple valid special values",
+			intervals: []int{0, -1, 1, 5, 1, 1, -7, -1, 1},
+			// partial sums: [0, 0, -1, 0, 5, 6, 7, 0, -1, 0]
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ValidateLeadingTone(tt.intervals); got != tt.want {
+				t.Errorf("ValidateIntroductoryTone() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

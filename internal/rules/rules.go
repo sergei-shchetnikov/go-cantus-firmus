@@ -829,3 +829,116 @@ func isMultipleOfSixOrEight(x int) bool {
 	absX := abs(x)
 	return absX == 6 || absX == 8 || absX == 12 || absX == 16 // etc. for larger octaves
 }
+
+// ValidateLeadingTone checks the rules for the introductory tone in a partial interval slice.
+// Returns true if all rules are satisfied, false otherwise.
+func ValidateLeadingTone(intervals []int) bool {
+	if len(intervals) == 0 {
+		return true
+	}
+
+	// Build a slice of partial sums (notes relative to the starting note)
+	partialSums := make([]int, len(intervals)+1)
+	partialSums[0] = 0
+	for i, interval := range intervals {
+		partialSums[i+1] = partialSums[i] + interval
+	}
+
+	// Check each partial sum against the introductory tone rules
+	for i, sum := range partialSums {
+		switch sum {
+		case -1:
+			if !isValidMinusOne(partialSums, i) {
+				return false
+			}
+		case 6:
+			if !isValidSix(partialSums, i) {
+				return false
+			}
+		case -8:
+			if !isValidMinusEight(partialSums, i) {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+// isValidMinusOne checks valid configurations for the number -1
+func isValidMinusOne(sums []int, index int) bool {
+	// Check configuration ..., 0, -1, 0, ...
+	if index > 0 && index < len(sums)-1 {
+		if sums[index-1] == 0 && sums[index+1] == 0 {
+			return true
+		}
+	}
+
+	// Check configuration ..., -2, -1, 0, ...
+	if index > 0 && index < len(sums)-1 {
+		if sums[index-1] == -2 && sums[index+1] == 0 {
+			return true
+		}
+	}
+
+	// Check configuration ..., 0, -1, -2, ...
+	if index > 0 && index < len(sums)-1 {
+		if sums[index-1] == 0 && sums[index+1] == -2 {
+			return true
+		}
+	}
+
+	return false
+}
+
+// isValidSix checks valid configurations for the number 6
+func isValidSix(sums []int, index int) bool {
+	// Check configuration ..., 7, 6, 7, ...
+	if index > 0 && index < len(sums)-1 {
+		if sums[index-1] == 7 && sums[index+1] == 7 {
+			return true
+		}
+	}
+
+	// Check configuration ..., 5, 6, 7, ...
+	if index > 0 && index < len(sums)-1 {
+		if sums[index-1] == 5 && sums[index+1] == 7 {
+			return true
+		}
+	}
+
+	// Check configuration ..., 7, 6, 5, ...
+	if index > 0 && index < len(sums)-1 {
+		if sums[index-1] == 7 && sums[index+1] == 5 {
+			return true
+		}
+	}
+
+	return false
+}
+
+// isValidMinusEight checks valid configurations for the number -8
+func isValidMinusEight(sums []int, index int) bool {
+	// Check configuration ..., -7, -8, -7, ...
+	if index > 0 && index < len(sums)-1 {
+		if sums[index-1] == -7 && sums[index+1] == -7 {
+			return true
+		}
+	}
+
+	// Check configuration ..., -9, -8, -7, ...
+	if index > 0 && index < len(sums)-1 {
+		if sums[index-1] == -9 && sums[index+1] == -7 {
+			return true
+		}
+	}
+
+	// Check configuration ..., -7, -8, -9, ...
+	if index > 0 && index < len(sums)-1 {
+		if sums[index-1] == -7 && sums[index+1] == -9 {
+			return true
+		}
+	}
+
+	return false
+}
