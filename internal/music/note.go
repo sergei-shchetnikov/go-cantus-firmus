@@ -161,3 +161,31 @@ func IsLeap(n1, n2 Note) bool {
 	// A leap is any interval larger than a second (step difference > 1)
 	return stepDiff > 1
 }
+
+// Semitones returns the number of semitones from C0 (0 semitones)
+// This can be used to compare note pitches
+func (n Note) Semitones() int {
+	// Diatonic steps from C to B (C=0, D=2, E=4, F=5, G=7, A=9, B=11)
+	diatonicSemitones := []int{0, 2, 4, 5, 7, 9, 11}
+
+	// Calculate semitones from diatonic step and alteration
+	semitones := diatonicSemitones[n.Step] + n.Alteration
+
+	// Add octave (12 semitones per octave)
+	return semitones + n.Octave*12
+}
+
+// Less returns true if this note is lower in pitch than the other note
+func (n Note) Less(other Note) bool {
+	return n.Semitones() < other.Semitones()
+}
+
+// Greater returns true if this note is higher in pitch than the other note
+func (n Note) Greater(other Note) bool {
+	return n.Semitones() > other.Semitones()
+}
+
+// EqualPitch returns true if the notes have the same pitch (same semitones value)
+func (n Note) EqualPitch(other Note) bool {
+	return n.Semitones() == other.Semitones()
+}
