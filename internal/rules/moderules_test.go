@@ -15,9 +15,9 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			name: "All perfect/major/minor intervals",
 			input: music.Realization{
 				{Step: 0, Octave: 4}, // C4
-				{Step: 1, Octave: 4}, // D4 (M2)
-				{Step: 2, Octave: 4}, // E4 (M2)
-				{Step: 0, Octave: 5}, // C5 (m6)
+				{Step: 1, Octave: 4}, // D4
+				{Step: 2, Octave: 4}, // E4
+				{Step: 0, Octave: 5}, // C5
 			},
 			expected: true,
 		},
@@ -25,7 +25,7 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			name: "Contains augmented interval",
 			input: music.Realization{
 				{Step: 0, Octave: 4},                // C4
-				{Step: 3, Octave: 4, Alteration: 1}, // F#4 (A4)
+				{Step: 3, Octave: 4, Alteration: 1}, // F#4
 			},
 			expected: false,
 		},
@@ -33,7 +33,7 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			name: "Contains diminished interval",
 			input: music.Realization{
 				{Step: 3, Octave: 4},                 // F4
-				{Step: 0, Octave: 5, Alteration: -1}, // Cb5 (d5)
+				{Step: 0, Octave: 5, Alteration: -1}, // Cb5
 			},
 			expected: false,
 		},
@@ -53,9 +53,9 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			name: "Mixed valid and invalid intervals",
 			input: music.Realization{
 				{Step: 0, Octave: 4},                // C4
-				{Step: 1, Octave: 4},                // D4 (M2)
-				{Step: 3, Octave: 4, Alteration: 1}, // F#4 (A4)
-				{Step: 0, Octave: 5},                // C5 (P5)
+				{Step: 1, Octave: 4},                // D4
+				{Step: 3, Octave: 4, Alteration: 1}, // F#4
+				{Step: 0, Octave: 5},                // C5
 			},
 			expected: false,
 		},
@@ -63,8 +63,8 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			name: "All minor intervals",
 			input: music.Realization{
 				{Step: 5, Octave: 4}, // A4
-				{Step: 0, Octave: 5}, // C5 (m3)
-				{Step: 3, Octave: 5}, // F5 (m3)
+				{Step: 0, Octave: 5}, // C5
+				{Step: 3, Octave: 5}, // F5
 			},
 			expected: true,
 		},
@@ -72,8 +72,8 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			name: "All perfect intervals",
 			input: music.Realization{
 				{Step: 0, Octave: 4}, // C4
-				{Step: 4, Octave: 4}, // G4 (P5)
-				{Step: 0, Octave: 5}, // C5 (P4)
+				{Step: 4, Octave: 4}, // G4
+				{Step: 0, Octave: 5}, // C5
 			},
 			expected: true,
 		},
@@ -82,7 +82,7 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			input: music.Realization{
 				{Step: 0, Octave: 4}, // C4
 				{Step: 1, Octave: 4}, // D4
-				{Step: 3, Octave: 4}, // F4 (M3 from C4)
+				{Step: 3, Octave: 4}, // F4
 			},
 			expected: true,
 		},
@@ -91,7 +91,7 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			input: music.Realization{
 				{Step: 0, Octave: 4},                // C4
 				{Step: 1, Octave: 4},                // D4
-				{Step: 3, Octave: 4, Alteration: 1}, // F#4 (A3 from C4)
+				{Step: 3, Octave: 4, Alteration: 1}, // F#4
 			},
 			expected: false,
 		},
@@ -100,7 +100,7 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			input: music.Realization{
 				{Step: 3, Octave: 4},                 // F4
 				{Step: 4, Octave: 4},                 // G4
-				{Step: 0, Octave: 5, Alteration: -1}, // Cb5 (d6 from F4)
+				{Step: 0, Octave: 5, Alteration: -1}, // Cb5
 			},
 			expected: false,
 		},
@@ -109,9 +109,9 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			input: music.Realization{
 				{Step: 0, Octave: 4}, // C4
 				{Step: 1, Octave: 4}, // D4
-				{Step: 3, Octave: 4}, // F4 (M3 from C4)
-				{Step: 4, Octave: 4}, // G4 (M2 from F4, P4 from D4)
-				{Step: 5, Octave: 4}, // A4 (M2 from G4, m3 from F4)
+				{Step: 3, Octave: 4}, // F4
+				{Step: 4, Octave: 4}, // G4
+				{Step: 5, Octave: 4}, // A4
 			},
 			expected: true,
 		},
@@ -120,9 +120,73 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			input: music.Realization{
 				{Step: 0, Octave: 4},                // C4
 				{Step: 1, Octave: 4},                // D4
-				{Step: 3, Octave: 4},                // F4 (M3 from C4)
-				{Step: 4, Octave: 4, Alteration: 1}, // G#4 (A4 from D4)
+				{Step: 3, Octave: 4},                // F4
+				{Step: 4, Octave: 4, Alteration: 1}, // G#4
 				{Step: 5, Octave: 4},                // A4
+			},
+			expected: false,
+		},
+		{
+			name: "Valid extremum intervals",
+			input: music.Realization{
+				{Step: 0, Octave: 4}, // C4 (extremum)
+				{Step: 1, Octave: 4}, // D4
+				{Step: 2, Octave: 4}, // E4 (extremum)
+				{Step: 1, Octave: 4}, // D4
+				{Step: 0, Octave: 4}, // C4 (extremum)
+			},
+			expected: true,
+		},
+		{
+			name: "Invalid augmented interval between extremums",
+			input: music.Realization{
+				{Step: 0, Octave: 4},                // C4 (extremum)
+				{Step: 1, Octave: 4},                // D4
+				{Step: 3, Octave: 4, Alteration: 1}, // F#4 (extremum)
+			},
+			expected: false,
+		},
+		{
+			name: "Invalid diminished interval between extremums",
+			input: music.Realization{
+				{Step: 3, Octave: 4},                 // F4 (extremum)
+				{Step: 2, Octave: 4},                 // E4
+				{Step: 0, Octave: 5, Alteration: -1}, // Cb5 (extremum)
+			},
+			expected: false,
+		},
+		{
+			name: "Invalid augmented step-2 interval between extremums",
+			input: music.Realization{
+				{Step: 0, Octave: 4},                // C4 (extremum)
+				{Step: 1, Octave: 4},                // D4
+				{Step: 2, Octave: 4},                // E4
+				{Step: 3, Octave: 4, Alteration: 1}, // F#4 (extremum)
+			},
+			expected: false,
+		},
+		{
+			name: "Complex valid case with extremums",
+			input: music.Realization{
+				{Step: 0, Octave: 4}, // C4 (extremum)
+				{Step: 1, Octave: 4}, // D4
+				{Step: 2, Octave: 4}, // E4 (extremum)
+				{Step: 1, Octave: 4}, // D4
+				{Step: 0, Octave: 4}, // C4 (extremum)
+				{Step: 4, Octave: 4}, // G4 (extremum)
+				{Step: 3, Octave: 4}, // F4
+				{Step: 2, Octave: 4}, // E4 (extremum)
+			},
+			expected: true,
+		},
+		{
+			name: "Complex invalid case with extremums",
+			input: music.Realization{
+				{Step: 0, Octave: 4},                 // C4 (extremum)
+				{Step: 1, Octave: 4},                 // D4
+				{Step: 3, Octave: 4, Alteration: 1},  // F#4 (extremum)
+				{Step: 2, Octave: 4},                 // E4
+				{Step: 0, Octave: 5, Alteration: -1}, // Cb5 (extremum)
 			},
 			expected: false,
 		},
