@@ -206,7 +206,7 @@ func ToMusicXML(sequences [][]Note) (string, error) {
 				DirectionType: DirectionType{
 					Metronome: &Metronome{
 						BeatUnit:  "quarter",
-						PerMinute: 240,
+						PerMinute: 300,
 					},
 				},
 				Sound: &Sound{
