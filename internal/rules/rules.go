@@ -965,3 +965,28 @@ func NoCloseLargeLeaps(intervals []int) bool {
 
 	return true
 }
+
+// NoMoreThanTwoConsecutiveThirds checks that there are no more than two consecutive intervals
+// with absolute value equal to 2 in the interval sequence.
+// Returns:
+//   - false if three or more consecutive intervals with absolute value 2 are found (rule violated)
+//   - true otherwise (rule satisfied)
+func NoMoreThanTwoConsecutiveThirds(intervals []int) bool {
+	if len(intervals) < 3 {
+		return true
+	}
+
+	consecutiveTwos := 0
+	for _, interval := range intervals {
+		if abs(interval) == 2 {
+			consecutiveTwos++
+			if consecutiveTwos > 2 {
+				return false
+			}
+		} else {
+			consecutiveTwos = 0
+		}
+	}
+
+	return true
+}

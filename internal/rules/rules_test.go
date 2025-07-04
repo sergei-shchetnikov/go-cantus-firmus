@@ -1264,3 +1264,65 @@ func TestNoCloseLargeLeaps(t *testing.T) {
 		})
 	}
 }
+
+func TestNoMoreThanTwoConsecutiveThirds(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+		{
+			name:      "empty slice",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "single element not a third",
+			intervals: []int{1},
+			want:      true,
+		},
+		{
+			name:      "single element third",
+			intervals: []int{2},
+			want:      true,
+		},
+		{
+			name:      "two consecutive thirds",
+			intervals: []int{2, 2},
+			want:      true,
+		},
+		{
+			name:      "three consecutive thirds",
+			intervals: []int{2, 2, 2},
+			want:      false,
+		},
+		{
+			name:      "negative thirds",
+			intervals: []int{-2, -2, -2},
+			want:      false,
+		},
+		{
+			name:      "mixed thirds and non-thirds",
+			intervals: []int{2, 2, 1, 2, 2},
+			want:      true,
+		},
+		{
+			name:      "multiple violations",
+			intervals: []int{2, 2, 2, 1, -2, -2, -2},
+			want:      false,
+		},
+		{
+			name:      "separated thirds",
+			intervals: []int{2, 2, 1, 2, 2, 3, 2, 2},
+			want:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NoMoreThanTwoConsecutiveThirds(tt.intervals); got != tt.want {
+				t.Errorf("NoMoreThanTwoConsecutiveThirds() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
