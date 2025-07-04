@@ -210,7 +210,7 @@ func ToMusicXML(sequences [][]Note) (string, error) {
 					},
 				},
 				Sound: &Sound{
-					Tempo: 240.0,
+					Tempo: 300.0,
 				},
 			}
 		}
