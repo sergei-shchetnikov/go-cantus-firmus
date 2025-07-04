@@ -1178,3 +1178,89 @@ func TestValidateLeadingTone(t *testing.T) {
 		})
 	}
 }
+
+func TestNoCloseLargeLeaps(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals []int
+		want      bool
+	}{
+
+		{
+			name:      "empty slice",
+			intervals: []int{},
+			want:      true,
+		},
+		{
+			name:      "single small step",
+			intervals: []int{1},
+			want:      true,
+		},
+		{
+			name:      "single leap",
+			intervals: []int{4},
+			want:      true,
+		},
+		{
+			name:      "leap followed by steps",
+			intervals: []int{4, 1, 1, -1},
+			want:      true,
+		},
+		{
+			name:      "separated leaps with multiple steps",
+			intervals: []int{4, 1, 1, -3, 1, 1, 5},
+			want:      true,
+		},
+
+		{
+			name:      "leap-step-leap ascending",
+			intervals: []int{4, 1, 5},
+			want:      false,
+		},
+		{
+			name:      "leap-step-leap descending",
+			intervals: []int{-4, 1, -5},
+			want:      false,
+		},
+		{
+			name:      "leap-step-leap mixed directions",
+			intervals: []int{4, -1, -5},
+			want:      false,
+		},
+
+		{
+			name:      "consecutive leaps ascending",
+			intervals: []int{4, 5, 3},
+			want:      false,
+		},
+		{
+			name:      "consecutive leaps descending",
+			intervals: []int{-4, -5, -3},
+			want:      false,
+		},
+		{
+			name:      "consecutive leaps mixed",
+			intervals: []int{4, -5, 3},
+			want:      false,
+		},
+
+		{
+			name:      "two leaps without step between",
+			intervals: []int{4, 5},
+			want:      true,
+		},
+		{
+			name:      "leap at start and end with step",
+			intervals: []int{4, 1, 1, 1, 1, 1, 5},
+			want:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NoCloseLargeLeaps(tt.intervals); got != tt.want {
+				t.Errorf("NoCloseLargeLeaps() = %v, want %v (intervals: %v)", got, tt.want, tt.intervals)
+			}
+		})
+	}
+}

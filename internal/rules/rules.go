@@ -942,3 +942,26 @@ func isValidMinusEight(sums []int, index int) bool {
 
 	return false
 }
+
+// NoCloseLargeLeaps checks that there are no two leaps (absolute value > 2)
+// separated by a single step (any interval). This prevents patterns like leap-step-leap
+// or leap-leap-leap
+// Returns:
+//   - false if two leaps are found with one interval between them (rule violated)
+//   - true otherwise (rule satisfied)
+func NoCloseLargeLeaps(intervals []int) bool {
+	if len(intervals) < 3 {
+		return true
+	}
+
+	for i := 0; i <= len(intervals)-3; i++ {
+		first := intervals[i]
+		second := intervals[i+2]
+
+		if abs(first) > 2 && abs(second) > 2 {
+			return false
+		}
+	}
+
+	return true
+}
