@@ -77,6 +77,55 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			},
 			expected: true,
 		},
+		{
+			name: "Valid step-2 intervals",
+			input: music.Realization{
+				{Step: 0, Octave: 4}, // C4
+				{Step: 1, Octave: 4}, // D4
+				{Step: 3, Octave: 4}, // F4 (M3 from C4)
+			},
+			expected: true,
+		},
+		{
+			name: "Invalid augmented step-2 interval",
+			input: music.Realization{
+				{Step: 0, Octave: 4},                // C4
+				{Step: 1, Octave: 4},                // D4
+				{Step: 3, Octave: 4, Alteration: 1}, // F#4 (A3 from C4)
+			},
+			expected: false,
+		},
+		{
+			name: "Invalid diminished step-2 interval",
+			input: music.Realization{
+				{Step: 3, Octave: 4},                 // F4
+				{Step: 4, Octave: 4},                 // G4
+				{Step: 0, Octave: 5, Alteration: -1}, // Cb5 (d6 from F4)
+			},
+			expected: false,
+		},
+		{
+			name: "Valid step-2 intervals with larger sequence",
+			input: music.Realization{
+				{Step: 0, Octave: 4}, // C4
+				{Step: 1, Octave: 4}, // D4
+				{Step: 3, Octave: 4}, // F4 (M3 from C4)
+				{Step: 4, Octave: 4}, // G4 (M2 from F4, P4 from D4)
+				{Step: 5, Octave: 4}, // A4 (M2 from G4, m3 from F4)
+			},
+			expected: true,
+		},
+		{
+			name: "Invalid step-2 interval in middle of sequence",
+			input: music.Realization{
+				{Step: 0, Octave: 4},                // C4
+				{Step: 1, Octave: 4},                // D4
+				{Step: 3, Octave: 4},                // F4 (M3 from C4)
+				{Step: 4, Octave: 4, Alteration: 1}, // G#4 (A4 from D4)
+				{Step: 5, Octave: 4},                // A4
+			},
+			expected: false,
+		},
 	}
 
 	for _, tt := range tests {
