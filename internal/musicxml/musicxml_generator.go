@@ -4,6 +4,8 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"go-cantus-firmus/internal/music"
+	"os"
 )
 
 // ScorePartwise represents the root element of a MusicXML score.
@@ -237,4 +239,35 @@ func ToMusicXML(sequences [][]Note) (string, error) {
 	}
 
 	return xml.Header + string(output), nil
+}
+
+// ConvertRealizationsToXMLNotes converts a slice of music.Realization to MusicXML Note format
+func ConvertRealizationsToXMLNotes(realizations []music.Realization) [][]Note {
+	var xmlSequences [][]Note
+	for _, realization := range realizations {
+		var xmlSeq []Note
+		for _, note := range realization {
+			xmlSeq = append(xmlSeq, Note{
+				Step:       note.Step,
+				Octave:     note.Octave,
+				Alteration: note.Alteration,
+			})
+		}
+		xmlSequences = append(xmlSequences, xmlSeq)
+	}
+	return xmlSequences
+}
+
+// GenerateAndSaveMusicXML generates MusicXML from note sequences and saves to file
+func GenerateAndSaveMusicXML(sequences [][]Note, filename string) error {
+	xmlString, err := ToMusicXML(sequences)
+	if err != nil {
+		return fmt.Errorf("error generating MusicXML: %w", err)
+	}
+
+	err = os.WriteFile(filename, []byte(xmlString), 0644)
+	if err != nil {
+		return fmt.Errorf("error writing MusicXML file: %w", err)
+	}
+	return nil
 }
