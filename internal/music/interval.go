@@ -2,7 +2,7 @@ package music
 
 import (
 	"fmt"
-	"math"
+	"go-cantus-firmus/internal/utils"
 )
 
 // Mod7 returns the non-negative remainder of division of n by 7.
@@ -110,7 +110,7 @@ func noteToSemitones(n Note) int {
 // but for quality determination, the absolute semitone difference is used first.
 func CalculateIntervalQuality(n1, n2 Note) (string, error) {
 	// Calculate the absolute semitone difference between the two notes
-	semitoneDiffAbs := int(math.Abs(float64(noteToSemitones(n2) - noteToSemitones(n1))))
+	semitoneDiffAbs := utils.Abs(noteToSemitones(n2) - noteToSemitones(n1))
 
 	// Calculate the diatonic numerical interval (e.g., 1st, 2nd, 3rd, etc.)
 	// This accounts for octave differences and descending intervals correctly.
@@ -129,7 +129,7 @@ func CalculateIntervalQuality(n1, n2 Note) (string, error) {
 	n2TotalStep := n2.Step + n2.Octave*7
 
 	// The raw diatonic step difference
-	rawStepDiff := int(math.Abs(float64(n2TotalStep - n1TotalStep)))
+	rawStepDiff := utils.Abs(n2TotalStep - n1TotalStep)
 
 	// The numerical interval is rawStepDiff + 1 (unison is 1, second is 2, etc.)
 	numericalInterval := rawStepDiff + 1

@@ -3,6 +3,7 @@ package music
 import (
 	"errors"
 	"fmt"
+	"go-cantus-firmus/internal/utils"
 )
 
 // Note represents a musical note
@@ -140,14 +141,6 @@ func Transpose(n Note, i Interval) Note {
 	}
 }
 
-// abs returns the absolute value of an integer
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
 // IsLeap determines whether the interval between two notes is a leap (larger than a second).
 // Returns true if the interval is larger than a second (i.e., a third or greater).
 func IsLeap(n1, n2 Note) bool {
@@ -156,7 +149,7 @@ func IsLeap(n1, n2 Note) bool {
 	n2TotalStep := n2.Step + n2.Octave*7
 
 	// Calculate the absolute difference in steps
-	stepDiff := abs(n2TotalStep - n1TotalStep)
+	stepDiff := utils.Abs((n2TotalStep - n1TotalStep))
 
 	// A leap is any interval larger than a second (step difference > 1)
 	return stepDiff > 1

@@ -8,6 +8,8 @@
 // to traditional counterpoint rules.
 package rules
 
+import "go-cantus-firmus/internal/utils"
+
 // ValidationFunc defines the type for a validation function.
 type ValidationFunc func(s []int) bool
 
@@ -177,7 +179,7 @@ func PreparedLeaps(intervals []int) bool {
 	}
 
 	last := intervals[n-1]
-	absLast := abs(last)
+	absLast := utils.Abs(last)
 
 	// Small steps don't need preparation
 	if absLast <= 2 {
@@ -211,7 +213,7 @@ func validateFifthLeap(intervals []int) bool {
 
 	if n >= 2 {
 		prev := intervals[n-2]
-		if sign(prev) == -sign(last) && abs(prev) >= 2 {
+		if sign(prev) == -sign(last) && utils.Abs(prev) >= 2 {
 			return true
 		}
 	}
@@ -244,24 +246,16 @@ func validateSixthLeap(intervals []int) bool {
 	case n >= 3:
 		prev1 := intervals[n-2]
 		prev2 := intervals[n-3]
-		if prev1 < 0 && prev2 < 0 && (abs(prev1) >= 2 || abs(prev2) >= 2) {
+		if prev1 < 0 && prev2 < 0 && (utils.Abs(prev1) >= 2 || utils.Abs(prev2) >= 2) {
 			return true
 		}
 		fallthrough
 	case n >= 2:
 		prev := intervals[n-2]
-		return prev < 0 && abs(prev) >= 3
+		return prev < 0 && utils.Abs(prev) >= 3
 	default:
 		return false
 	}
-}
-
-// abs returns the absolute value of an integer
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
 }
 
 // ValidateLeapResolution checks if all leaps (intervals with absolute value > 2)
@@ -280,7 +274,7 @@ func ValidateLeapResolution(intervals []int) bool {
 	// Find all leaps (absolute value > 2)
 	leapIndices := make([]int, 0)
 	for i := 0; i < n; i++ {
-		if abs(intervals[i]) > 2 {
+		if utils.Abs(intervals[i]) > 2 {
 			leapIndices = append(leapIndices, i)
 		}
 	}
@@ -298,7 +292,7 @@ func ValidateLeapResolution(intervals []int) bool {
 		}
 
 		leap := intervals[leapIndex]
-		absLeap := abs(leap)
+		absLeap := utils.Abs(leap)
 		leapSlice := intervals[leapIndex:]
 
 		// Dispatch validation based on leap size
@@ -347,7 +341,7 @@ func validateFifthLeapResolution(intervals []int) bool {
 
 	// Case with at least two elements after leap
 	next2 := intervals[2]
-	return (sign(leap) == -sign(next1) && abs(next1) >= 2) ||
+	return (sign(leap) == -sign(next1) && utils.Abs(next1) >= 2) ||
 		(sign(leap) == -sign(next1) && sign(leap) == -sign(next2))
 }
 
@@ -374,14 +368,14 @@ func validateSixthLeapResolution(intervals []int) bool {
 
 	// Case with exactly two elements after leap
 	if n == 3 {
-		return (next1 < 0 && abs(next1) >= 3) ||
+		return (next1 < 0 && utils.Abs(next1) >= 3) ||
 			(sign(leap) == -sign(next1) && sign(leap) == -sign(next2))
 	}
 
 	// Case with at least three elements after leap
 	next3 := intervals[3]
-	return (next1 < 0 && abs(next1) >= 3) ||
-		(next1 < 0 && next2 < 0 && (abs(next1)+abs(next2)) >= 3) ||
+	return (next1 < 0 && utils.Abs(next1) >= 3) ||
+		(next1 < 0 && next2 < 0 && (utils.Abs(next1)+utils.Abs(next2)) >= 3) ||
 		(next1 < 0 && next2 < 0 && next3 < 0)
 }
 
@@ -432,10 +426,10 @@ func NoNoteRepetitionAfterLeap(intervals []int) bool {
 		current := intervals[i]
 		next := intervals[i+1]
 
-		if abs(current) > 1 &&
-			abs(next) > 1 &&
+		if utils.Abs(current) > 1 &&
+			utils.Abs(next) > 1 &&
 			sign(current) == -sign(next) &&
-			abs(current) == abs(next) {
+			utils.Abs(current) == utils.Abs(next) {
 			return false
 		}
 	}
@@ -521,7 +515,7 @@ func AvoidSeventhBetweenExtrema(intervals []int) bool {
 	extrema = append(extrema, partialSums[len(partialSums)-1]) // Include last note
 
 	for i := 0; i < len(extrema)-1; i++ {
-		if abs(extrema[i]-extrema[i+1]) == 6 {
+		if utils.Abs(extrema[i]-extrema[i+1]) == 6 {
 			return false
 		}
 	}
@@ -826,7 +820,7 @@ func AvoidSeventhNinthBetweenExtremes(intervals []int) bool {
 
 // isMultipleOfSixOrEight checks if a number is multiple of 6 or 8 (absolute value)
 func isMultipleOfSixOrEight(x int) bool {
-	absX := abs(x)
+	absX := utils.Abs(x)
 	return absX == 6 || absX == 8 || absX == 12 || absX == 16 // etc. for larger octaves
 }
 
@@ -958,7 +952,7 @@ func NoCloseLargeLeaps(intervals []int) bool {
 		first := intervals[i]
 		second := intervals[i+2]
 
-		if abs(first) > 2 && abs(second) > 2 {
+		if utils.Abs(first) > 2 && utils.Abs(second) > 2 {
 			return false
 		}
 	}
@@ -978,7 +972,7 @@ func NoMoreThanTwoConsecutiveThirds(intervals []int) bool {
 
 	consecutiveTwos := 0
 	for _, interval := range intervals {
-		if abs(interval) == 2 {
+		if utils.Abs(interval) == 2 {
 			consecutiveTwos++
 			if consecutiveTwos > 2 {
 				return false
