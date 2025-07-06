@@ -290,6 +290,32 @@ func TestNoRepeatingPatterns(t *testing.T) {
 			intervals: []int{5, -3, 4, -4, 2, -2},
 			want:      true,
 		},
+		//
+		{
+			name:      "3-note pattern with 1 separator (a,b,c,X,a,b,c)",
+			intervals: []int{1, 1, 3, -5, 1, 1}, // Heights: [0, 1, 2, 5, 0, 1, 2]
+			want:      false,
+		},
+		{
+			name:      "3-note pattern with 2 separators (a,b,c,X,Y,a,b,c)",
+			intervals: []int{2, 2, -3, 2, -3, 2, 2}, // Heights: [0, 2, 4, 1, 3, 0, 2, 4]
+			want:      false,
+		},
+		{
+			name:      "3-note pattern with 3 separators (a,b,c,X,Y,Z,a,b,c)",
+			intervals: []int{3, -1, 3, 1, -1, -5, 3, -1}, // Heights: [0, 3, 2, 5, 6, 5, 0, 3, 2]
+			want:      false,
+		},
+		{
+			name:      "No false positive for similar but non-repeating patterns",
+			intervals: []int{3, -1, -1, -1, 3, -2}, // Heights: [0, 3, 2, 1, 0, 3, 1]
+			want:      true,
+		},
+		{
+			name:      "Long sequence without patterns",
+			intervals: []int{3, -1, 3, -1, -1, -2, -1}, // Heights: [0, 3, 2, 5, 4, 3, 1, 0]
+			want:      true,
+		},
 	}
 
 	for _, tt := range tests {

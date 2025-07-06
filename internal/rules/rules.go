@@ -135,7 +135,16 @@ func NoRangeExceedsDecima(intervals []int) bool {
 
 // NoRepeatingPatterns checks that the cantus firmus doesn't contain repeating pitch patterns
 // by examining the sequence of partial sums (note heights relative to the starting note).
-// Detects patterns like ..., a, b, a, b, ... or ..., a, b, c, a, b, c, ...
+// Detects the following repeating patterns:
+//   - Immediate repetitions:
+//   - 2-note patterns: ..., a, b, a, b, ...
+//   - 3-note patterns: ..., a, b, c, a, b, c, ...
+//   - Patterns with separators between repetitions:
+//   - 3-note patterns with 1 separator: ..., a, b, c, X, a, b, c, ...
+//   - 3-note patterns with 2 separators: ..., a, b, c, X, Y, a, b, c, ...
+//   - 3-note patterns with 3 separators: ..., a, b, c, X, Y, Z, a, b, c, ...
+//
+// where X, Y, Z can be any single pitch value.
 // Works with partial slices during generation.
 //
 // Returns:
@@ -154,6 +163,7 @@ func NoRepeatingPatterns(intervals []int) bool {
 
 	n := len(partialSums)
 
+	// Check for 2-note patterns (a,b,a,b)
 	for i := 0; i <= n-4; i++ {
 		a, b := partialSums[i], partialSums[i+1]
 		if partialSums[i+2] == a && partialSums[i+3] == b {
@@ -161,9 +171,34 @@ func NoRepeatingPatterns(intervals []int) bool {
 		}
 	}
 
+	// Check for 3-note patterns (a,b,c,a,b,c)
 	for i := 0; i <= n-6; i++ {
 		a, b, c := partialSums[i], partialSums[i+1], partialSums[i+2]
 		if partialSums[i+3] == a && partialSums[i+4] == b && partialSums[i+5] == c {
+			return false
+		}
+	}
+
+	// Check for 3-note patterns with 1 separator (a,b,c,x,a,b,c)
+	for i := 0; i <= n-7; i++ {
+		a, b, c := partialSums[i], partialSums[i+1], partialSums[i+2]
+		if partialSums[i+4] == a && partialSums[i+5] == b && partialSums[i+6] == c {
+			return false
+		}
+	}
+
+	// Check for 3-note patterns with 2 separators (a,b,c,x,y,a,b,c)
+	for i := 0; i <= n-8; i++ {
+		a, b, c := partialSums[i], partialSums[i+1], partialSums[i+2]
+		if partialSums[i+5] == a && partialSums[i+6] == b && partialSums[i+7] == c {
+			return false
+		}
+	}
+
+	// Check for 3-note patterns with 3 separators (a,b,c,x,y,z,a,b,c)
+	for i := 0; i <= n-9; i++ {
+		a, b, c := partialSums[i], partialSums[i+1], partialSums[i+2]
+		if partialSums[i+6] == a && partialSums[i+7] == b && partialSums[i+8] == c {
 			return false
 		}
 	}
