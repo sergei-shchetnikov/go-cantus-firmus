@@ -51,7 +51,7 @@ func TestNoBeginWithFive(t *testing.T) {
 	}
 }
 
-func TestNoFiveOfSameSign(t *testing.T) {
+func TestLimitDirectionalMotion(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    []int
@@ -98,18 +98,18 @@ func TestNoFiveOfSameSign(t *testing.T) {
 			expected: true,
 		},
 		{
-			name:     "Four positive, then negative (no violation)",
+			name:     "Four positive, violation",
 			input:    []int{1, 2, 3, 4, -5, 6},
-			expected: true,
+			expected: false,
 		},
 		{
-			name:     "Four negative, then positive (no violation)",
+			name:     "Four negative, violation",
 			input:    []int{-1, -2, -3, -4, 5, -6},
-			expected: true,
+			expected: false,
 		},
 		{
 			name:     "Long slice, no violation",
-			input:    []int{1, 2, 3, 4, -1, 2, 3, 4, -1, 2, 3, 4, -1},
+			input:    []int{1, 2, 1, 1, -1, 2, 3, -1, -1, 2, 3, -1, -1},
 			expected: true,
 		},
 		{
@@ -121,7 +121,7 @@ func TestNoFiveOfSameSign(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NoFiveOfSameSign(tt.input)
+			got := LimitDirectionalMotion(tt.input)
 			if got != tt.expected {
 				t.Errorf("NoFourOfSameSign(%v) = %v; expected %v", tt.input, got, tt.expected)
 			}

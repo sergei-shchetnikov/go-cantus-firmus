@@ -33,30 +33,43 @@ func NoBeginWithFive(intervals []int) bool {
 	return true
 }
 
-// NoFiveOfSameSign checks that there are no five consecutive numbers
-// with the same sign (positive or negative) in the currentSlice.
-// In a musical context, this rule helps prevent excessive or monotonous
-// stepwise motion or leaps in a single direction (e.g., always ascending or always descending)
-// for an extended period, which can lead to a less engaging melodic line.
-// Returns false if five consecutive numbers of the same sign are found, otherwise true.
-// Works with incomplete slices.
-func NoFiveOfSameSign(currentSlice []int) bool {
+// LimitDirectionalMotion enforces contrapuntal rules regarding consecutive melodic motion:
+// 1. Prohibits more than four consecutive intervals in the same direction (ascending/descending)
+// 2. Restricts the cumulative melodic span in one direction to a sixth
+func LimitDirectionalMotion(currentSlice []int) bool {
 	n := len(currentSlice)
-	if n < 5 {
+	if n == 0 {
 		return true
 	}
 
-	for i := 0; i <= n-5; i++ {
-		s1 := sign(currentSlice[i])
-		s2 := sign(currentSlice[i+1])
-		s3 := sign(currentSlice[i+2])
-		s4 := sign(currentSlice[i+3])
-		s5 := sign(currentSlice[i+4])
+	currentSign := sign(currentSlice[0])
+	currentSum := currentSlice[0]
+	count := 1
 
-		if s1 == s2 && s2 == s3 && s3 == s4 && s4 == s5 {
-			return false
+	for i := 1; i < n; i++ {
+		s := sign(currentSlice[i])
+
+		if s == currentSign {
+			count++
+			currentSum += currentSlice[i]
+
+			// Check for five consecutive same-sign numbers
+			if count >= 5 {
+				return false
+			}
+
+			// Check if absolute sum exceeds 5
+			if utils.Abs(currentSum) > 5 {
+				return false
+			}
+		} else {
+			// Reset for new sign
+			currentSign = s
+			currentSum = currentSlice[i]
+			count = 1
 		}
 	}
+
 	return true
 }
 
