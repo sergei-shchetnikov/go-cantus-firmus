@@ -37,7 +37,7 @@ func IsFreeOfAugmentedDiminished(r music.Realization) bool {
 		}
 	}
 
-	// Find all extremum notes (step 3)
+	// Build extended extremums slice (step 3)
 	extremums := make(music.Realization, 0)
 	extremums = append(extremums, r[0]) // Always include first note
 
@@ -46,9 +46,14 @@ func IsFreeOfAugmentedDiminished(r music.Realization) bool {
 		current := r[i]
 		next := r[i+1]
 
-		// Check if current note is an extremum
-		if (current.Greater(prev) && current.Greater(next)) ||
-			(current.Less(prev) && current.Less(next)) {
+		// Check if current note is a local extremum
+		isExtremum := (current.Greater(prev) && current.Greater(next)) ||
+			(current.Less(prev) && current.Less(next))
+
+		// Check if current note is "highlighted" (surrounded by leaps)
+		isHighlighted := music.IsLeap(prev, current) || music.IsLeap(current, next)
+
+		if isExtremum || isHighlighted {
 			extremums = append(extremums, current)
 		}
 	}
@@ -69,6 +74,17 @@ func IsFreeOfAugmentedDiminished(r music.Realization) bool {
 	// Check intervals between extremums separated by one note (step 5)
 	for i := 0; i < len(extremums)-2; i++ {
 		quality, err := music.CalculateIntervalQuality(extremums[i], extremums[i+2])
+		if err != nil {
+			return false
+		}
+		if quality == "d" || quality == "A" {
+			return false
+		}
+	}
+
+	// New: Check intervals between extremums separated by two notes (step 6)
+	for i := 0; i < len(extremums)-3; i++ {
+		quality, err := music.CalculateIntervalQuality(extremums[i], extremums[i+3])
 		if err != nil {
 			return false
 		}
