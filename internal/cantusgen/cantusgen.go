@@ -11,7 +11,7 @@ var leaps = []int{-4, -3, -2, 2, 3, 4, 5}
 var cantusValidators = []rules.ValidationFunc{
 	rules.NoBeginWithFive,
 	rules.NoExcessiveNoteRepetition,
-	rules.NoFiveOfSameSign,
+	rules.LimitDirectionalMotion,
 	rules.NoRangeExceedsDecima,
 	rules.NoRepeatingPatterns,
 	rules.PreparedLeaps,
