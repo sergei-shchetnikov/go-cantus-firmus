@@ -18,7 +18,6 @@ import (
 // Project: go-cantus-firmus
 // Created: 2025-06-21
 
-// This is a test/demo program to verify the core functionality
 func main() {
 	fmt.Println("=== Cantus Firmus Generator ===")
 	fmt.Println("This program generates all possible cantus firmi in whole notes")
