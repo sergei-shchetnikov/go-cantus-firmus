@@ -1,28 +1,26 @@
-# go-cantus-firmus
+# Cantus Firmus Generator
 
 This project is a Cantus Firmus generator written in Go. It creates all possible Cantus Firmi in whole notes that satisfy the rules of strict style and saves them to a MusicXML file.
 
 ## Table of Contents
-- [Description](#description)
+- [Cantus Firmus Rules](#cantus-firmus-rules)
 - [Features](#features)
 - [Project Structure](#project-structure)
 - [Usage](#usage)
   - [Building](#building)
   - [Running](#running)
-- [Cantus Firmus Rules](#cantus-firmus-rules)
 - [License](#license)
 - [Author](#author)
 
-## Description
-
-The `go-cantus-firmus` program is designed for musicians, composers, and students studying counterpoint. It automates the process of generating Cantus Firmi, ensuring adherence to the basic rules of strict style, such as:
+## Cantus Firmus Rules
 
 - Starting and ending on the tonic.
 - Predominantly stepwise motion with a limited number of leaps.
+- Leaps greater than a third must be compensated by motion in the opposite direction.
+- Absence of excessive repetition of individual notes and note patterns.
+- The upper and/or lower climaxes are reached only once.
 - Absence of augmented or diminished intervals, including in melodic contours.
 - For minor mode, the 6th and 7th degrees are raised when necessary.
-
-The results are saved in MusicXML format, allowing them to be easily opened in most music notation software.
 
 ## Features
 
@@ -90,21 +88,9 @@ The program will ask you questions in the console:
 
 1. Desired length of the Cantus Firmus (from 8 to 16 notes).
 2. Mode (major, dorian, phrygian, lydian, mixolydian, minor, locrian).
-3. Desired number of leaps (from 0 to length-4).
+3. Desired number of leaps.
 
 After entering the data, the program will generate Cantus Firmi and ask how many of them to save. The MusicXML file will be saved in the current directory with a name including generation parameters and a timestamp, for example: `cantus_length10_major_leaps1_20250621_150405.musicxml`.
-
-## Cantus Firmus Rules
-
-This generator applies the following main rules of strict style:
-
-- Starts and ends on the tonic of the mode.
-- Predominantly stepwise motion.
-- Limited number of leaps (intervals greater than a second).
-- Leaps greater than a third must be compensated by motion in the opposite direction.
-- Absence of augmented and diminished intervals, including in melodic contours.
-- Absence of excessive repetition of individual notes and note patterns.
-- The upper and/or lower climaxes are reached only once.
 
 ## License
 
