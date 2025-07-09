@@ -3,6 +3,7 @@
 This project is a Cantus Firmus generator written in Go. It creates all possible Cantus Firmi in whole notes that satisfy the rules of strict style and saves them to a MusicXML file.
 
 ## Table of Contents
+- [Example](#example)
 - [Cantus Firmus Rules](#cantus-firmus-rules)
 - [Features](#features)
 - [Project Structure](#project-structure)
@@ -11,6 +12,10 @@ This project is a Cantus Firmus generator written in Go. It creates all possible
   - [Running](#running)
 - [License](#license)
 - [Author](#author)
+
+## Example
+Here is an example of a generated Cantus Firmus with the parameters: length 10, major mode, and 3 leaps.
+![](./images/cantus_1.PNG)
 
 ## Cantus Firmus Rules
 
