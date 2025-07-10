@@ -82,16 +82,5 @@ func IsFreeOfAugmentedDiminished(r music.Realization) bool {
 		}
 	}
 
-	// New: Check intervals between extremums separated by two notes (step 6)
-	for i := 0; i < len(extremums)-3; i++ {
-		quality, err := music.CalculateIntervalQuality(extremums[i], extremums[i+3])
-		if err != nil {
-			return false
-		}
-		if quality == "d" || quality == "A" {
-			return false
-		}
-	}
-
 	return true
 }
