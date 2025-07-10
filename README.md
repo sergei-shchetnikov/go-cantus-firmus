@@ -57,25 +57,60 @@ Here is an example of a generated Cantus Firmus with the parameters: length 10, 
 
 ## Usage
 
-### Building
+### How to Install and Run:
 
-Before you begin, ensure you have Go installed.
+1.  **Download the archive** for your operating system from the "Assets" section below.
 
-To build the executable, navigate to the project's root directory and run:
+2.  **Unpack the archive** to a convenient location.
 
-```bash
-go build -o cantusgen ./cmd
-```
-
-This will create an executable file named `cantusgen` (or `cantusgen.exe` on Windows) in the project's root directory.
+      * **Windows:**
+          * Download `cantusgen_windows_amd64.zip`.
+          * Unzip it and run `cantusgen_windows_amd64.exe` from your Command Prompt or PowerShell.
+      * **Linux/macOS:**
+          * Download `cantusgen_darwin_amd64.tar.gz` (for macOS) or `cantusgen_linux_amd64.tar.gz` (for Linux).
+          * Unpack the archive using: `tar -xzf cantusgen_darwin_amd64.tar.gz`
+          * Open your terminal, navigate to the folder with the unpacked file.
+          * Make the file executable: `chmod +x cantusgen_darwin_amd64`
+          * Run the program: `./cantusgen_darwin_amd64`
 
 ### Running
 
-After building, you can run the program:
+After unpacking the downloaded archive, you can run the program. The method depends on your operating system:
 
-```bash
-./cantusgen
-```
+### Windows
+
+1.  Open **Command Prompt** or **PowerShell**.
+2.  Navigate to the directory where you unpacked the `cantusgen_windows_amd64.zip` archive.
+3.  Run the executable:
+    ```bash
+    cantusgen_windows_amd64.exe
+    ```
+
+### macOS
+
+1.  Open **Terminal**.
+2.  Navigate to the directory where you unpacked the `cantusgen_darwin_amd64.tar.gz` archive.
+3.  Ensure the file is executable (if you haven't already):
+    ```bash
+    chmod +x cantusgen_darwin_amd64
+    ```
+4.  Run the program:
+    ```bash
+    ./cantusgen_darwin_amd64
+    ```
+
+### Linux
+
+1.  Open **Terminal**.
+2.  Navigate to the directory where you unpacked the `cantusgen_linux_amd64.tar.gz` archive.
+3.  Ensure the file is executable (if you haven't already):
+    ```bash
+    chmod +x cantusgen_linux_amd64
+    ```
+4.  Run the program:
+    ```bash
+    ./cantusgen_linux_amd64
+    ```
 
 The program will ask you questions in the console:
 
