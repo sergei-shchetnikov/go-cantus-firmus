@@ -33,7 +33,7 @@ Here is an example of a generated Cantus Firmus with the parameters: length 10, 
 
 2. **Clone the Repository**  
    ```bash
-   git clone https://github.com/yourusername/go-cantus-firmus.git
+   git clone https://github.com/sergei-shchetnikov/go-cantus-firmus
    ```
 
 3. **Navigate to Project Directory**  
