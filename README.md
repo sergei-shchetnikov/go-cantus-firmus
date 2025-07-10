@@ -1,17 +1,15 @@
 # Cantus Firmus Generator
 
-This project is a Cantus Firmus generator written in Go. It creates all possible Cantus Firmi in whole notes that satisfy the rules of strict style and saves them to a MusicXML file.
+This CLI program generates all possible Cantus Firmi that adhere to the rules of strict style and saves them to a MusicXML file.
 
-## Table of Contents
-- [Example](#example)
-- [Cantus Firmus Rules](#cantus-firmus-rules)
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Usage](#usage)
-  - [Building](#building)
-  - [Running](#running)
-- [License](#license)
-- [Author](#author)
+## Features
+
+- Generation of Cantus Firmi of a specified length (8 to 16 notes).
+- Selection from several musical modes (major, dorian, phrygian, lydian, mixolydian, minor, locrian).
+- Specification of the desired number of leaps in the Cantus Firmus.
+- Filtering of results based on strict style rules.
+- Saving generated Cantus Firmi to a MusicXML file.
+- Option to choose how many Cantus Firmi to save (random selection if the number is less than the total).
 
 ## Example
 Here is an example of a generated Cantus Firmus with the parameters: length 10, major mode, and 3 leaps.
@@ -27,22 +25,12 @@ Here is an example of a generated Cantus Firmus with the parameters: length 10, 
 - Absence of augmented or diminished intervals, including in melodic contours.
 - For minor mode, the 6th and 7th degrees are raised when necessary.
 
-## Features
-
-- Generation of Cantus Firmi of a specified length (8 to 16 notes).
-- Selection from several musical modes (major, dorian, phrygian, lydian, mixolydian, minor, locrian).
-- Specification of the desired number of leaps in the Cantus Firmus.
-- Filtering of results based on strict style rules.
-- Saving generated Cantus Firmi to a MusicXML file.
-- Option to choose how many Cantus Firmi to save (random selection if the number is less than the total).
-
 ## Project Structure
 
 ```
 .
 ├── cmd
 │   └── main.go               # Main executable file of the program
-├── go.mod                    # Go module file
 └── internal
     ├── cantusgen             # Logic for generating interval sequences
     │   ├── cantusgen.go
