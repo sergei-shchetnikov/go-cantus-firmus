@@ -27,19 +27,25 @@ Here is an example of a generated Cantus Firmus with the parameters: length 10, 
 
 ### How to Install and Run:
 
-1.  **Download the archive** for your operating system from the "Assets" section below.
+1. **Install Prerequisites**  
+   - Install [Go](https://golang.org/dl/)
+   - Install [Git](https://git-scm.com/downloads)
 
-2.  **Unpack the archive** to a convenient location.
+2. **Clone the Repository**  
+   ```bash
+   git clone https://github.com/yourusername/go-cantus-firmus.git
+   ```
 
-      * **Windows:**
-          * Download `cantusgen_windows_amd64.zip`.
-          * Unzip it and run `cantusgen_windows_amd64.exe` from your Command Prompt or PowerShell.
-      * **macOS:**
-          * Download `cantusgen_darwin_amd64.tar.gz`
-          * Unpack the archive using: `tar -xzf cantusgen_darwin_amd64.tar.gz`
-          * Open your terminal, navigate to the folder with the unpacked file.
-          * Make the file executable: `chmod +x cantusgen_darwin_amd64`
-          * Run the program: `./cantusgen_darwin_amd64`
+3. **Navigate to Project Directory**  
+   ```bash
+   cd go-cantus-firmus/cmd
+   ```
+
+4. **Run the Program**  
+   Execute the following command:
+   ```bash
+   go run main.go
+   ```
 
 The program will ask you questions in the console:
 
