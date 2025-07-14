@@ -96,3 +96,38 @@ func adjustMinorAlterations(realization Realization) Realization {
 
 	return adjusted
 }
+
+// IsNoteSurroundedByLinearMotion determines if the note at the given index `i` in a Realization is surrounded by linear motion.
+// This means that notes at `i-1`, `i`, and `i+1` must form a consecutive ascending or descending sequence,
+// where the interval between successive notes is a second (stepwise).
+//
+// Returns:
+//   - true if the notes are in linear (stepwise) motion
+//   - false otherwise (including when the index `i` is out of bounds for checking surrounding notes)
+func IsNoteSurroundedByLinearMotion(r Realization, i int) bool {
+	if i <= 0 || i >= len(r)-1 {
+		return false // Not enough notes to check for surrounding linear motion
+	}
+
+	nPrev := r[i-1]
+	nCurrent := r[i]
+	nNext := r[i+1]
+
+	// Calculate the total step count for each note including octaves
+	nPrevTotalStep := nPrev.Step + nPrev.Octave*7
+	nCurrentTotalStep := nCurrent.Step + nCurrent.Octave*7
+	nNextTotalStep := nNext.Step + nNext.Octave*7
+
+	// Check if the steps are consecutive and in the same direction
+	// Case 1: Ascending linear motion (e.g., C4, D4, E4 or B3, C4, D4)
+	if nCurrentTotalStep == nPrevTotalStep+1 && nNextTotalStep == nCurrentTotalStep+1 {
+		return true
+	}
+
+	// Case 2: Descending linear motion (e.g., E4, D4, C4 or D4, C4, B3)
+	if nCurrentTotalStep == nPrevTotalStep-1 && nNextTotalStep == nCurrentTotalStep-1 {
+		return true
+	}
+
+	return false
+}

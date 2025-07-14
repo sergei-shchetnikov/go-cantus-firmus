@@ -214,3 +214,149 @@ func TestAdjustMinorAlterations(t *testing.T) {
 		})
 	}
 }
+
+func TestIsNoteSurroundedByLinearMotion(t *testing.T) {
+	tests := []struct {
+		name        string
+		realization Realization
+		index       int
+		expected    bool
+	}{
+		{
+			name: "Ascending linear motion C4-D4-E4",
+			realization: Realization{
+				{Step: 0, Octave: 4, Alteration: 0}, // C4
+				{Step: 1, Octave: 4, Alteration: 0}, // D4
+				{Step: 2, Octave: 4, Alteration: 0}, // E4
+			},
+			index:    1,
+			expected: true,
+		},
+		{
+			name: "Descending linear motion E4-D4-C4",
+			realization: Realization{
+				{Step: 2, Octave: 4, Alteration: 0}, // E4
+				{Step: 1, Octave: 4, Alteration: 0}, // D4
+				{Step: 0, Octave: 4, Alteration: 0}, // C4
+			},
+			index:    1,
+			expected: true,
+		},
+		{
+			name: "Ascending linear motion with octave change B3-C4-D4",
+			realization: Realization{
+				{Step: 6, Octave: 3, Alteration: 0}, // B3
+				{Step: 0, Octave: 4, Alteration: 0}, // C4
+				{Step: 1, Octave: 4, Alteration: 0}, // D4
+			},
+			index:    1,
+			expected: true,
+		},
+		{
+			name: "Descending linear motion with octave change D4-C4-B3",
+			realization: Realization{
+				{Step: 1, Octave: 4, Alteration: 0}, // D4
+				{Step: 0, Octave: 4, Alteration: 0}, // C4
+				{Step: 6, Octave: 3, Alteration: 0}, // B3
+			},
+			index:    1,
+			expected: true,
+		},
+		{
+			name: "Not linear motion - leap C4-F4-E4",
+			realization: Realization{
+				{Step: 0, Octave: 4, Alteration: 0}, // C4
+				{Step: 3, Octave: 4, Alteration: 0}, // F4 (leap)
+				{Step: 2, Octave: 4, Alteration: 0}, // E4
+			},
+			index:    1,
+			expected: false,
+		},
+		{
+			name: "Not linear motion - direction change C4-E4-D4",
+			realization: Realization{
+				{Step: 0, Octave: 4, Alteration: 0}, // C4
+				{Step: 2, Octave: 4, Alteration: 0}, // E4
+				{Step: 1, Octave: 4, Alteration: 0}, // D4
+			},
+			index:    1,
+			expected: false,
+		},
+		{
+			name: "Index at start of realization",
+			realization: Realization{
+				{Step: 0, Octave: 4, Alteration: 0},
+				{Step: 1, Octave: 4, Alteration: 0},
+				{Step: 2, Octave: 4, Alteration: 0},
+			},
+			index:    0,
+			expected: false,
+		},
+		{
+			name: "Index at end of realization",
+			realization: Realization{
+				{Step: 0, Octave: 4, Alteration: 0},
+				{Step: 1, Octave: 4, Alteration: 0},
+				{Step: 2, Octave: 4, Alteration: 0},
+			},
+			index:    2,
+			expected: false,
+		},
+		{
+			name: "Realization too short (1 note)",
+			realization: Realization{
+				{Step: 0, Octave: 4, Alteration: 0},
+			},
+			index:    0,
+			expected: false,
+		},
+		{
+			name: "Realization too short (2 notes)",
+			realization: Realization{
+				{Step: 0, Octave: 4, Alteration: 0},
+				{Step: 1, Octave: 4, Alteration: 0},
+			},
+			index:    0,
+			expected: false,
+		},
+		{
+			name: "With alteration but still linear C#4-D4-E4",
+			realization: Realization{
+				{Step: 0, Octave: 4, Alteration: 1}, // C#4
+				{Step: 1, Octave: 4, Alteration: 0}, // D4
+				{Step: 2, Octave: 4, Alteration: 0}, // E4
+			},
+			index:    1,
+			expected: true,
+		},
+		{
+			name: "Linear motion with alteration (F#4-G#4-A#4)",
+			realization: Realization{
+				{Step: 3, Octave: 4, Alteration: 1}, // F#4
+				{Step: 4, Octave: 4, Alteration: 1}, // G#4
+				{Step: 5, Octave: 4, Alteration: 1}, // A#4
+			},
+			index:    1,
+			expected: true,
+		},
+		{
+			name: "Linear motion with alteration (C4-Db4-E4)",
+			realization: Realization{
+				{Step: 0, Octave: 4, Alteration: 0},  // C4
+				{Step: 1, Octave: 4, Alteration: -1}, // Db4
+				{Step: 2, Octave: 4, Alteration: 0},  // E4
+			},
+			index:    1,
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := IsNoteSurroundedByLinearMotion(tt.realization, tt.index)
+			if actual != tt.expected {
+				t.Errorf("For test '%s': expected %v, got %v", tt.name, tt.expected, actual)
+			}
+		})
+	}
+}
