@@ -1,86 +1,118 @@
 package rules
 
-import (
-	"go-cantus-firmus/internal/music"
-)
+import "go-cantus-firmus/internal/music"
 
-// IsFreeOfAugmentedDiminished checks if a Realization contains no augmented ("A") or diminished ("d") intervals
-// between adjacent notes or notes separated by one note, and also checks for these intervals in extremum notes.
-// Returns:
-//   - true if all checked intervals are perfect, major, or minor
-//   - false if any augmented/diminished interval is found
-//   - false if interval calculation fails (invalid notes)
+// IsFreeOfAugmentedDiminished checks a Realization for specific conditions related to augmented or diminished intervals.
 func IsFreeOfAugmentedDiminished(r music.Realization) bool {
+	return rule1(r) && rule2(r)
+}
+
+// rule1 checks every pair of notes n1 and n2 within a distance of 3 or fewer other notes
+// (i.e., indices differ by 4 or less), if the interval between n1 and n2 is augmented ("A")
+// or diminished ("d"), then at least one of n1 or n2 must be surrounded by linear motion
+// (as determined by IsNoteSurroundedByLinearMotion). If this condition is not met for any pair,
+// the function immediately returns false. If all such pairs satisfy the condition, it returns true.
+func rule1(r music.Realization) bool {
+	for i := range r {
+		for j := i + 1; j < len(r); j++ {
+			if j-i <= 4 {
+				n1 := r[i]
+				n2 := r[j]
+
+				quality, err := music.CalculateIntervalQuality(n1, n2)
+				if err != nil {
+					return false
+				}
+
+				if quality == "A" || quality == "d" {
+					n1LinearMotion := music.IsNoteSurroundedByLinearMotion(r, i)
+					n2LinearMotion := music.IsNoteSurroundedByLinearMotion(r, j)
+
+					if !(n1LinearMotion || n2LinearMotion) {
+						return false
+					}
+				}
+			}
+		}
+	}
+	return true
+}
+
+// rule2 checks a Realization for ascending or descending sequences of notes.
+// It returns false immediately if the interval between the first and last notes
+// of such a sequence is augmented ("A") or diminished ("d").
+// This rule considers any change in step as part of the sequence as long as the direction is maintained.
+func rule2(r music.Realization) bool {
 	if len(r) < 2 {
-		return true // No intervals to check
+		return true
 	}
 
-	// Check intervals between adjacent notes (step 1)
-	for i := 0; i < len(r)-1; i++ {
-		quality, err := music.CalculateIntervalQuality(r[i], r[i+1])
-		if err != nil {
-			return false
-		}
-		if quality == "d" || quality == "A" {
-			return false
+	for i := 0; i < len(r); i++ {
+		currentNote := r[i]
+		var sequenceDirection *bool = nil
+		sequenceStartIdx := i
+
+		for j := i + 1; j < len(r); j++ {
+			nextNote := r[j]
+
+			isCurrentMovementAscending := nextNote.Greater(currentNote)
+			isCurrentMovementDescending := nextNote.Less(currentNote)
+
+			if !isCurrentMovementAscending && !isCurrentMovementDescending {
+				if j-1 > sequenceStartIdx {
+					n1 := r[sequenceStartIdx]
+					n2 := r[j-1]
+
+					quality, err := music.CalculateIntervalQuality(n1, n2)
+					if err != nil {
+						return false
+					}
+
+					if quality == "A" || quality == "d" {
+						return false
+					}
+				}
+				i = j - 1
+				break
+			}
+
+			if sequenceDirection == nil {
+				b := isCurrentMovementAscending
+				sequenceDirection = &b
+			} else if *sequenceDirection != isCurrentMovementAscending {
+				if j-1 > sequenceStartIdx {
+					n1 := r[sequenceStartIdx]
+					n2 := r[j-1]
+
+					quality, err := music.CalculateIntervalQuality(n1, n2)
+					if err != nil {
+						return false
+					}
+
+					if quality == "A" || quality == "d" {
+						return false
+					}
+				}
+				i = j - 1
+				break
+			}
+
+			if j == len(r)-1 {
+				n1 := r[sequenceStartIdx]
+				n2 := r[j]
+
+				quality, err := music.CalculateIntervalQuality(n1, n2)
+				if err != nil {
+					return false
+				}
+
+				if quality == "A" || quality == "d" {
+					return false
+				}
+				i = j
+			}
+			currentNote = nextNote
 		}
 	}
-
-	// Check intervals between notes separated by one note (step 2)
-	for i := 0; i < len(r)-2; i++ {
-		quality, err := music.CalculateIntervalQuality(r[i], r[i+2])
-		if err != nil {
-			return false
-		}
-		if quality == "d" || quality == "A" {
-			return false
-		}
-	}
-
-	// Build extended extremums slice (step 3)
-	extremums := make(music.Realization, 0)
-	extremums = append(extremums, r[0]) // Always include first note
-
-	for i := 1; i < len(r)-1; i++ {
-		prev := r[i-1]
-		current := r[i]
-		next := r[i+1]
-
-		// Check if current note is a local extremum
-		isExtremum := (current.Greater(prev) && current.Greater(next)) ||
-			(current.Less(prev) && current.Less(next))
-
-		// Check if current note is "highlighted" (surrounded by leaps)
-		isHighlighted := music.IsLeap(prev, current) || music.IsLeap(current, next)
-
-		if isExtremum || isHighlighted {
-			extremums = append(extremums, current)
-		}
-	}
-
-	extremums = append(extremums, r[len(r)-1]) // Always include last note
-
-	// Check intervals between adjacent extremums (step 4)
-	for i := 0; i < len(extremums)-1; i++ {
-		quality, err := music.CalculateIntervalQuality(extremums[i], extremums[i+1])
-		if err != nil {
-			return false
-		}
-		if quality == "d" || quality == "A" {
-			return false
-		}
-	}
-
-	// Check intervals between extremums separated by one note (step 5)
-	for i := 0; i < len(extremums)-2; i++ {
-		quality, err := music.CalculateIntervalQuality(extremums[i], extremums[i+2])
-		if err != nil {
-			return false
-		}
-		if quality == "d" || quality == "A" {
-			return false
-		}
-	}
-
 	return true
 }

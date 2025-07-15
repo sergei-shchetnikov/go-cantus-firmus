@@ -116,17 +116,6 @@ func TestIsFreeOfAugmentedDiminished(t *testing.T) {
 			expected: true,
 		},
 		{
-			name: "Invalid step-2 interval in middle of sequence",
-			input: music.Realization{
-				{Step: 0, Octave: 4},                // C4
-				{Step: 1, Octave: 4},                // D4
-				{Step: 3, Octave: 4},                // F4
-				{Step: 4, Octave: 4, Alteration: 1}, // G#4
-				{Step: 5, Octave: 4},                // A4
-			},
-			expected: false,
-		},
-		{
 			name: "Valid extremum intervals",
 			input: music.Realization{
 				{Step: 0, Octave: 4}, // C4 (extremum)
