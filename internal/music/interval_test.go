@@ -71,6 +71,9 @@ func TestCalculateIntervalQuality(t *testing.T) {
 		// Cross-octave intervals
 		{"C4 to D5 (Major Ninth)", Note{0, 4, 0}, Note{1, 5, 0}, "M", false},
 		{"C4 to G3 (Perfect Fourth Down)", Note{0, 4, 0}, Note{4, 3, 0}, "P", false},
+
+		//
+		{"G# to B (Minor Third)", Note{4, 4, 1}, Note{6, 4, 0}, "m", false},
 	}
 
 	for _, tt := range tests {
