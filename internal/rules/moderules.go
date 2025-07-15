@@ -7,15 +7,15 @@ func IsFreeOfAugmentedDiminished(r music.Realization) bool {
 	return rule1(r) && rule2(r)
 }
 
-// rule1 checks every pair of notes n1 and n2 within a distance of 2 or fewer other notes
-// (i.e., indices differ by 3 or less), if the interval between n1 and n2 is augmented ("A")
+// rule1 checks every pair of notes n1 and n2 within a distance of 1 or fewer other notes
+// (i.e., indices differ by 2 or less), if the interval between n1 and n2 is augmented ("A")
 // or diminished ("d"), then at least one of n1 or n2 must be surrounded by linear motion
 // (as determined by IsNoteSurroundedByLinearMotion). If this condition is not met for any pair,
 // the function immediately returns false. If all such pairs satisfy the condition, it returns true.
 func rule1(r music.Realization) bool {
 	for i := range r {
 		for j := i + 1; j < len(r); j++ {
-			if j-i <= 3 {
+			if j-i <= 2 {
 				n1 := r[i]
 				n2 := r[j]
 
