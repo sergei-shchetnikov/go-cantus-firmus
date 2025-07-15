@@ -62,6 +62,7 @@ type Realization []Note
 // Rules:
 //   - Adds sharp to G when the configuration ..., A, G, A, ... appears
 //   - Adds sharps to both F and G when the configuration ..., F, G, A, ... appears
+//   - Adds sharps to G and F when the configuration ..., A, G, F, G, A, ... appears
 //   - In all other cases, no sharps are added
 func adjustMinorAlterations(realization Realization) Realization {
 	if len(realization) < 3 {
@@ -90,6 +91,28 @@ func adjustMinorAlterations(realization Realization) Realization {
 			}
 			if current.Alteration == 0 {
 				adjusted[i].Alteration = 1
+			}
+		}
+		// Configuration ..., A, G, F, G, A, ... (requires at least 5 notes)
+		if i >= 2 && i < len(adjusted)-2 {
+			prevPrev := adjusted[i-2]
+			nextNext := adjusted[i+2]
+
+			if prevPrev.Step == 5 && // A
+				prev.Step == 4 && // G
+				current.Step == 3 && // F
+				next.Step == 4 && // G
+				nextNext.Step == 5 { // A
+
+				if prev.Alteration == 0 {
+					adjusted[i-1].Alteration = 1 // G
+				}
+				if current.Alteration == 0 {
+					adjusted[i].Alteration = 1 // F
+				}
+				if next.Alteration == 0 {
+					adjusted[i+1].Alteration = 1 // G
+				}
 			}
 		}
 	}
